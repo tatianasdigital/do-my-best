@@ -131,7 +131,7 @@ window.DMB_CONFIG = {
     litAt: -0.5,                  // the background turns #E3F14A (GamesTexts #0E0F0E) once the stage is this far in
                                   // (screens; -1 = its top just entered the viewport, 0 = it fills the viewport)
     litDuration: 800,             // ms colour change
-    revealLength: 1.0,            // viewport heights of scrolling for the GamesNewImage window to fill the screen
+    revealLength: 0.9,            // viewport heights of scrolling for the GamesNewImage circle to fill the screen (was 1.0 — one wheel step shorter)
     revealEasing: 'inOutCubic',
     stateLength: 1.0,             // viewport heights of scrolling per game state
     stateDuration: 1100,          // ms — block transition (GS1 → GS2 → GS3)
