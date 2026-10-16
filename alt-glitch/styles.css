@@ -1,0 +1,165 @@
+/* DO MY BEST — alternative first screen (glitch concept), desktop only.
+ * Static layout in Figma pixels inside the 1920×1080 .stage box (F7 / F8).
+ * Motion is driven by main.js, glitch.js and fill.js; timings live in config.js. */
+
+:root {
+  --c-yellow: #e3f14a;   /* F7 background, F8 titles */
+  --c-black: #0e0f0e;    /* F8 background, F7 titles */
+  --c-white: #ffffff;
+  /* set by main.js */
+  --stage-scale: 1;
+  --stage-x: 0px;
+  --stage-y: 0px;
+  --chrome-dur: 260ms;
+  --chrome-ease: ease;
+  --rm-fade: 220ms;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;            /* controlled full-screen sequence: the page never scrolls */
+  overscroll-behavior: none;
+  background: var(--c-yellow);
+}
+body { -webkit-font-smoothing: antialiased; }
+
+.viewport { position: fixed; inset: 0; overflow: hidden; isolation: isolate; }
+
+/* ---------- Scenes & stage ---------- */
+
+.scene { position: absolute; inset: 0; pointer-events: none; }
+.scene--f7     { z-index: 1; background: var(--c-yellow); }
+.scene--f8     { z-index: 2; background: var(--c-black); clip-path: inset(0 0 100% 0); }  /* fill.js drives the clip */
+.scene--title2 { z-index: 3; display: none; }
+.scene--chrome { z-index: 4; pointer-events: auto; }
+
+.viewport.is-filled .scene--f8 { clip-path: none; }
+.viewport.is-glitching .scene--title2 { display: block; }
+
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  transform: translate(var(--stage-x), var(--stage-y)) scale(var(--stage-scale));
+}
+
+.layer { position: absolute; display: block; }
+img { display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+
+/* ---------- Titles ---------- */
+
+/* Entrance masks: invisible boxes exactly as wide as each line.
+   Title1 waits hidden just left of its mask and slides in from the line start;
+   Title2 waits just right of its mask and slides in from the line end. */
+.title-band { position: absolute; overflow: hidden; }
+.title-band--1 { left: 499.46px; width: 915.514px; top: 380px; height: 160px; }  /* Title1 line: x 499.46 – 1414.97 */
+.title-band--2 { left: 348.55px; width: 1225.77px; top: 505px; height: 160px; }  /* Title2 line: x 348.55 – 1574.32 */
+
+/* Title1 (F7 17:212): x 499.46, y 415.6 */
+.title1--f7 { left: 0; top: 35.6px; width: 915.514px; height: 95.2px; will-change: transform; }
+.title1--f8 { left: 499.46px; top: 415.6px; width: 915.514px; height: 95.2px; }
+
+/* Title2 "BUILDERS." (F7 17:203 + period 17:202): x 348.55, y 527.46 */
+.title2--old { left: 0; top: 22.46px; width: 1225.77px; height: 95.34px; will-change: transform; }
+.title2__word   { position: absolute; left: 0; top: 0; width: 1177.66px; height: 95.34px; }
+.title2__period { position: absolute; left: 1190.21px; top: 71.4px; width: 35.5601px; height: 21.14px; }
+/* Title2 "DESTROYERS." (F8 17:248): x 133.97, kept on the F7 line (y 527.46) */
+.title2--new,
+.title2--f8 { left: 133.97px; top: 527.46px; width: 1654.93px; height: 95.34px; }
+
+/* Which Title2 is resting: old until the glitch has swapped it */
+.title2--new { visibility: hidden; }
+.viewport.is-swapped .title2--old { visibility: hidden; }
+.viewport.is-swapped .title2--new { visibility: visible; }
+/* while glitching, the strips replace the resting Title2 */
+.viewport.is-glitching .title2--old,
+.viewport.is-glitching .title2--new { visibility: hidden; }
+
+/* ---------- Title2 glitch strips ---------- */
+
+/* Region covering both Title2 versions: y 505 – 645 (frame space) */
+.title2-strips { position: absolute; left: 0; top: 505px; width: 1920px; height: 140px; }
+.t2-strip { position: absolute; inset: 0; }
+.t2-strip__inner { position: absolute; inset: 0; will-change: transform; }
+.t2 { position: absolute; display: none; }
+.t2--old { left: 348.55px; top: 22.46px; width: 1225.77px; height: 95.34px; }
+.t2--new { left: 133.97px; top: 22.46px; width: 1654.93px; height: 95.34px; }
+.t2.is-on { display: block; }
+
+/* ---------- Chrome (logo, social, menu, scroll hint) ---------- */
+
+.logo { position: absolute; left: 20px; top: 24px; width: 100px; height: 100px; object-fit: cover; }
+
+.social { position: absolute; left: 1776px; top: 40px; display: flex; gap: 16px; }
+.social__icon { position: relative; width: 24px; height: 24px; overflow: hidden; }
+.social__icon img { position: absolute; left: 0; top: 0; width: 24px; height: 24px;
+                    transition: opacity var(--chrome-dur) var(--chrome-ease); }
+.social__f8 { opacity: 0; }
+
+.scroll-hint {
+  position: absolute;
+  left: 69px;
+  top: 1027px;
+  transform: translateX(-50%);
+  font-family: 'Syne', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--c-black);
+  transition: color var(--chrome-dur) var(--chrome-ease);
+}
+
+.nav {
+  position: absolute;
+  left: 880px;
+  top: 978px;
+  width: 160px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  border-radius: 49px;
+  background: var(--c-black);
+  transition: background-color var(--chrome-dur) var(--chrome-ease);
+}
+.nav__label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--c-white);
+  white-space: nowrap;
+  transition: color var(--chrome-dur) var(--chrome-ease);
+}
+.nav__icon { position: relative; flex-shrink: 0; width: 30px; height: 30px; overflow: hidden; }
+.nav__icon i { position: absolute; left: 0; width: 40px; height: 2px; background: var(--c-white);
+               transition: background-color var(--chrome-dur) var(--chrome-ease); }
+.nav__icon i:nth-child(1) { top: 8px; }
+.nav__icon i:nth-child(2) { top: 14px; }
+.nav__icon i:nth-child(3) { top: 20px; }
+
+/* F8 chrome colours (Figma F8: Navigation 17:292, Social Links 17:299, Scroll Hint 17:291) */
+.viewport.is-chrome-f8 .scroll-hint { color: var(--c-white); }
+.viewport.is-chrome-f8 .nav         { background-color: var(--c-yellow); }
+.viewport.is-chrome-f8 .nav__label  { color: #000; }
+.viewport.is-chrome-f8 .nav__icon i { background-color: var(--c-black); }
+.viewport.is-chrome-f8 .social__f7  { opacity: 0; }
+.viewport.is-chrome-f8 .social__f8  { opacity: 1; }
+
+/* ---------- Reduced motion: each step is a short crossfade ---------- */
+
+.viewport.is-reduced .scene--f8 { clip-path: none; opacity: 0; transition: opacity var(--rm-fade) ease; }
+.viewport.is-reduced.is-filled .scene--f8 { opacity: 1; }
+.viewport.is-reduced .title2--old,
+.viewport.is-reduced .title2--new { visibility: visible; transition: opacity var(--rm-fade) ease; }
+.viewport.is-reduced .title2--new { opacity: 0; }
+.viewport.is-reduced.is-swapped .title2--old { opacity: 0; }
+.viewport.is-reduced.is-swapped .title2--new { opacity: 1; }

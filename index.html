@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DO MY BEST — Indie Game Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500&family=Syne:wght@400;600;800&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!--
+    Layers are grouped into full-viewport "scenes". Each scene holds a .stage:
+    a 1920×1080 box in Figma coordinates, scaled to fit the viewport.
+    Bottom → top:
+      scene--light  : Frame 01 yellow background + Title1 (black)
+      scene--dark   : black background reveal (clip wipe) + Title1 (white, Frame 02)
+      scene--fx     : Title2 swap slot, GlassEffect composition, Frame 04 content
+      scene--chrome : Frame 01 chrome (logo, social, menu, scroll hint)
+      scene--chrome-dark : Frame 02–04 chrome, wiped in with the black background
+      scene--smoke  : Smoke, above everything
+  -->
+  <main class="viewport" id="viewport" data-stage="-1" aria-label="DO MY BEST — World builders. World destroyers.">
+
+    <!-- Initial background + Title1 (Frame 01) -->
+    <div class="scene scene--light" data-layer="initialBackground">
+      <div class="stage">
+        <img class="layer title1-f01" data-layer="title1" src="assets/f01-title1.svg" width="915.514" height="95.2" alt="World">
+        <div class="title2-slot">
+          <div class="layer title2-out" data-layer="title2Original">
+            <img class="title2-out__word" src="assets/f01-title2.svg" width="1177.66" height="95.34" alt="Builders.">
+            <img class="title2-out__period" src="assets/f01-title2-period.svg" width="35.5601" height="21.14" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Black background reveal. Everything inside is revealed by the same
+         top-to-bottom wipe, so the titles turn white as the black passes them.
+         Then the Title2 swap runs here: Frame 01 Title2 slides down and out,
+         Frame 02 Title2 slides in from above. -->
+    <div class="scene scene--dark" data-layer="blackBackground">
+      <div class="stage">
+        <img class="layer title1-f02" data-layer="title1Dark" src="assets/f02-title1.svg" width="915.514" height="95.2" alt="">
+        <div class="title2-slot">
+          <div class="layer title2-out" data-layer="title2OriginalDark">
+            <img class="title2-out__word" src="assets/f01-title2-white.svg" width="1177.66" height="95.34" alt="">
+            <img class="title2-out__period" src="assets/f01-title2-period-white.svg" width="35.5601" height="21.14" alt="">
+          </div>
+          <img class="layer title2-in" data-layer="title2Incoming" src="assets/f02-title2.svg" width="1654.93" height="95.34" alt="Destroyers.">
+        </div>
+      </div>
+    </div>
+
+    <!-- Animated content -->
+    <div class="scene scene--fx">
+      <div class="stage">
+
+        <!-- GlassEffect composition (Frame 03). DOM order = stacking order from Figma. -->
+        <div class="glass" data-layer="glassComposition">
+          <img class="layer glass__piece glass-effect-1" data-layer="glassEffect1" src="assets/glass-effect-1.png" width="929" height="585" alt="">
+          <img class="layer glass__piece glass-effect-3" data-layer="glassEffect3" src="assets/glass-effect-3.png" width="929" height="495" alt="">
+          <img class="layer glass__piece glass-effect-2" data-layer="glassEffect2" src="assets/glass-effect-2.png" width="988" height="553" alt="">
+          <img class="layer glass__piece glass-effect-4" data-layer="glassEffect4" src="assets/glass-effect-4.png" width="988" height="527" alt="">
+        </div>
+
+        <!-- Frame 04 -->
+        <h1 class="layer headline" data-layer="headline">
+          <span class="headline__line headline__line--1">world builders.</span>
+          <span class="headline__line">World destroyers.</span>
+        </h1>
+        <div class="layer character" data-layer="character">
+          <img src="assets/f04-character.png" width="1920" height="1080" alt="">
+        </div>
+        <div class="layer studio-labels" data-layer="studioLabels">
+          <p class="studio-label studio-label--left">INDIE GAME STUDIO</p>
+          <p class="studio-label studio-label--right">INDIE GAME STUDIO</p>
+          <p class="studio-label studio-label--established">SINCE 2010</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chrome: Frame 01 variant -->
+    <div class="scene scene--chrome" aria-hidden="false">
+      <div class="stage">
+        <img class="logo" src="assets/logo.png" width="100" height="100" alt="DO MY BEST">
+        <div class="social">
+          <span class="social__icon"><img src="assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+        </div>
+        <p class="scroll-hint">( Scroll )</p>
+        <div class="nav"><span class="nav__label">menu</span><span class="nav__icon"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+
+    <!-- Chrome: Frames 02–04 variant, revealed by the same wipe as the black background -->
+    <div class="scene scene--chrome-dark" data-layer="chromeDark" aria-hidden="true">
+      <div class="stage">
+        <img class="logo" src="assets/logo.png" width="100" height="100" alt="">
+        <div class="social">
+          <span class="social__icon"><img src="assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+        </div>
+        <p class="scroll-hint">( Scroll )</p>
+        <div class="nav"><span class="nav__label">menu</span><span class="nav__icon"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+
+    <!-- Smoke: top-most layer -->
+    <div class="scene scene--smoke">
+      <div class="stage">
+        <div class="layer smoke" data-layer="smoke">
+          <img class="smoke__plume smoke__plume--a" src="assets/f04-smoke.png" width="500" height="364" alt="">
+          <img class="smoke__plume smoke__plume--b" src="assets/f04-smoke.png" width="500" height="364" alt="">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="shatter.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+/* DO MY BEST — first-screen animation prototype (desktop only)
+ * All positions are Figma pixels inside the 1920×1080 .stage box.
+ * Animated properties are driven from main.js; this file only holds the
+ * static layout and the starting (pre-intro) state. */
+
+:root {
+  --c-yellow: #e3f14a;
+  --c-black: #0e0f0e;
+  --c-white: #ffffff;
+  /* set by main.js on resize */
+  --stage-scale: 1;
+  --stage-x: 0px;
+  --stage-y: 0px;
+  --glass-exit: 1200px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;           /* the page is a controlled full-screen sequence */
+  background: var(--c-black);
+  overscroll-behavior: none;
+}
+
+body { -webkit-font-smoothing: antialiased; }
+
+.viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---------- Scenes & stage ---------- */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scene--light       { z-index: 1; background: var(--c-yellow); }
+.scene--dark        { z-index: 2; background: var(--c-black); clip-path: inset(0 0 100% 0); }
+.scene--fx          { z-index: 3; }
+.scene--chrome      { z-index: 4; pointer-events: auto; }
+.scene--chrome-dark { z-index: 5; clip-path: inset(0 0 100% 0); }
+.scene--smoke       { z-index: 6; }
+
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  transform: translate(var(--stage-x), var(--stage-y)) scale(var(--stage-scale));
+}
+
+.layer { position: absolute; display: block; will-change: opacity, transform; }
+img { display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+
+/* ---------- Titles (Frames 01 / 02) ---------- */
+
+.title1-f01 { left: 499.46px; top: 415.6px; width: 915.514px; height: 95.2px; opacity: 0; }
+.title1-f02 { left: 499.46px; top: 438.6px; width: 915.514px; height: 95.2px; }
+
+/* Clip band shared by the outgoing and incoming Title2 blocks */
+.title2-slot {
+  position: absolute;
+  left: 0;
+  width: 1920px;
+  overflow: hidden;
+  /* top / height come from config (main.js) */
+}
+
+/* positioned relative to the slot; main.js sets `top` from config */
+.title2-out { left: 348.55px; width: 1225.77px; height: 95.34px; opacity: 0; }
+.title2-out__word   { position: absolute; left: 0; top: 0; width: 1177.66px; height: 95.34px; }
+.title2-out__period { position: absolute; left: 1190.21px; top: 71.4px; width: 35.5601px; height: 21.14px; }
+.title2-in  { left: 133.97px; width: 1654.93px; height: 95.34px; }
+
+/* ---------- GlassEffect composition (Frame 03) ---------- */
+
+/* Glass pieces are the Figma renders of GlassEffect1–4. Figma exports them
+   opaque on #0e0f0e; they were converted to transparent PNGs (see README) so
+   the title shows through exactly as in Frame 03. */
+.glass {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  will-change: transform;
+}
+.glass__piece { opacity: 0; }
+.glass-effect-1 { left: 0;     top: 0;     width: 929px; height: 585px; }
+.glass-effect-3 { left: 0;     top: 585px; width: 929px; height: 495px; }
+.glass-effect-2 { left: 932px; top: 0;     width: 988px; height: 553px; }
+.glass-effect-4 { left: 932px; top: 553px; width: 988px; height: 527px; }
+
+/* Shards (Stage 6) — built by shatter.js */
+.shards {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  perspective: var(--shatter-perspective, 1400px);
+  perspective-origin: 925px 545px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.shard {
+  position: absolute;
+  background-repeat: no-repeat;
+  backface-visibility: visible;
+  will-change: transform;
+}
+
+/* ---------- Frame 04 ---------- */
+
+.headline {
+  left: 136px;          /* calc(50% + 37px) − 1722/2 */
+  top: 201px;
+  width: 1722px;
+  height: 448px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 140px;
+  line-height: 0.8;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--c-white);
+  opacity: 0;
+}
+.headline__line { display: block; }
+
+.character {
+  left: 709px;           /* calc(50% + 0.5px) − 503/2 */
+  top: 194px;
+  width: 503px;
+  height: 691px;
+  overflow: hidden;
+  opacity: 0;
+}
+.character img { position: absolute; left: 0; top: 0; height: 100%; width: 243.96%; }
+
+.studio-labels { left: 0; top: 0; width: 1920px; height: 1080px; opacity: 0; }
+.studio-label {
+  position: absolute;
+  top: 670px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.26;
+  color: var(--c-white);
+  white-space: nowrap;
+}
+.studio-label--left        { left: 172px; }
+.studio-label--right       { left: 1633px; }
+.studio-label--established { left: 594px; }
+
+/* Smoke: two copies of the original asset, half a cycle apart, rise continuously */
+.smoke { left: 464px; top: 0; width: 660px; height: 480px; opacity: 0; }
+.smoke__plume {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.smoke.is-drifting .smoke__plume {
+  animation: smoke-rise var(--smoke-period, 7600ms) linear infinite;
+}
+.smoke.is-drifting .smoke__plume--b { animation-delay: calc(var(--smoke-period, 7600ms) / -2); }
+
+@keyframes smoke-rise {
+  0%   { opacity: 0;
+         transform: translate(0, var(--smoke-start, 14px)) scale(1); }
+  22%  { opacity: var(--smoke-peak, 1); }
+  50%  { transform: translate(var(--smoke-sway, 6px), calc((var(--smoke-start, 14px) - var(--smoke-rise, 64px)) / 2)) scale(calc((1 + var(--smoke-scale, 1.035)) / 2)); }
+  72%  { opacity: var(--smoke-peak, 1); }
+  100% { opacity: 0;
+         transform: translate(0, calc(var(--smoke-start, 14px) - var(--smoke-rise, 64px))) scale(var(--smoke-scale, 1.035)); }
+}
+
+/* ---------- Chrome (logo, social, menu, scroll hint) ---------- */
+
+.logo { position: absolute; left: 20px; top: 24px; width: 100px; height: 100px; object-fit: cover; }
+
+.social { position: absolute; left: 1776px; top: 40px; display: flex; gap: 16px; }
+.social__icon { position: relative; width: 24px; height: 24px; overflow: hidden; }
+.social__icon img { width: 24px; height: 24px; }
+
+.scroll-hint {
+  position: absolute;
+  left: 69px;
+  top: 1027px;
+  transform: translateX(-50%);
+  font-family: 'Syne', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--c-black);
+}
+
+.nav {
+  position: absolute;
+  left: 880px;
+  top: 978px;
+  width: 160px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  border-radius: 49px;
+  background: var(--c-black);
+}
+.nav__label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--c-white);
+  white-space: nowrap;
+}
+.nav__icon { position: relative; flex-shrink: 0; width: 30px; height: 30px; overflow: hidden; }
+.nav__icon i { position: absolute; left: 0; width: 40px; height: 2px; background: var(--c-white); }
+.nav__icon i:nth-child(1) { top: 8px; }
+.nav__icon i:nth-child(2) { top: 14px; }
+.nav__icon i:nth-child(3) { top: 20px; }
+
+/* Frames 02–04 chrome colours */
+.scene--chrome-dark .scroll-hint { color: var(--c-white); }
+.scene--chrome-dark .nav         { background: var(--c-yellow); }
+.scene--chrome-dark .nav__label  { color: #000; }
+.scene--chrome-dark .nav__icon i { background: var(--c-black); }

@@ -1,0 +1,180 @@
+/* DO MY BEST — first screen F12 → F13 → F14 (desktop only).
+ * Static layout in Figma pixels on the 1920×1080 .stage; motion in main.js / fill.js / flow.js. */
+
+:root {
+  --c-black: #0e0f0e;
+  --c-yellow: #e3f14a;
+  --c-white: #ffffff;
+  --stage-scale: 1;    /* set by main.js */
+  --stage-x: 0px;
+  --stage-y: 0px;
+  --chrome-dur: 260ms;
+  --chrome-ease: ease;
+  --fade: 260ms;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;            /* controlled full-screen sequence: the page never scrolls */
+  overscroll-behavior: none;
+  background: var(--c-yellow);
+}
+body { -webkit-font-smoothing: antialiased; }
+
+.viewport { position: fixed; inset: 0; overflow: hidden; isolation: isolate; }
+
+.scene { position: absolute; inset: 0; pointer-events: none; }
+.scene--f12    { z-index: 1; background: var(--c-yellow); }
+.scene--f13    { z-index: 2; background: var(--c-black); clip-path: inset(0 0 100% 0); } /* fill.js drives the clip */
+.scene--chrome { z-index: 3; pointer-events: auto; }
+.viewport.is-filled .scene--f13 { clip-path: none; }
+
+.stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  transform: translate(var(--stage-x), var(--stage-y)) scale(var(--stage-scale));
+}
+
+img { display: block; max-width: none; user-select: none; -webkit-user-drag: none; }
+
+/* ---------- Titles (F12 30:560, F13 30:676, F14 30:618) ---------- */
+/* Boldonse 200px, line-height 1.4 (280px lines), uppercase, centred.
+   Figma's trailing spaces ("World ", "destroyers. ") are ignored when centring there,
+   so they are left out here. */
+.title-text,
+.title {
+  position: absolute;
+  display: block;
+  height: 280px;
+  font-family: 'Boldonse', sans-serif;
+  font-weight: 400;
+  font-size: 200px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* F12: entrance masks (left / width measured from the text by main.js) */
+.title-mask { position: absolute; height: 280px; overflow: hidden; }
+.title-mask--1 { top: 252px; }
+.title-mask--2 { top: 532px; }
+.title-text { top: 0; color: var(--c-black); will-change: transform; }
+
+/* F13 / F14: positioned with Figma's own boxes and centred */
+.title { text-align: center; color: var(--c-yellow); }
+.title1--f13 { left: 225px; top: 252px; width: 1471px; }
+.title2--f13 { left: 225px; top: 532px; width: 1471px; }   /* "BUILDERS."    */
+.title2--f14 { left: 171px; top: 532px; width: 1579px; visibility: hidden; }  /* "DESTROYERS." */
+
+.viewport.is-f14 .title2--f13 { visibility: hidden; }
+.viewport.is-f14 .title2--f14 { visibility: visible; }
+.viewport.is-morphing .title2 { visibility: hidden !important; }
+.viewport.is-morphing .title-text.title2 { visibility: visible !important; } /* F12 copy stays (it is covered anyway) */
+
+/* WebGL morph canvas over the Title2 line (top / height set by flow.js) */
+.flow-canvas { position: absolute; left: 0; width: 1920px; pointer-events: none; visibility: hidden; }
+.viewport.is-morphing .flow-canvas { visibility: visible; }
+
+/* ---------- Character (F14 32:689): 592×811 at (625, 126), Figma crop ---------- */
+.character { position: absolute; left: 625px; top: 126px; width: 592px; height: 811px; overflow: hidden; visibility: hidden; }
+.character img { position: absolute; left: 0; top: 0; width: 243.96%; height: 100%; }
+.viewport.is-char .character { visibility: visible; }
+.viewport.is-char-morphing .character { visibility: hidden; }
+.char-canvas { position: absolute; pointer-events: none; visibility: hidden; }
+.viewport.is-char-morphing .char-canvas { visibility: visible; }
+
+/* ---------- Studio label (30:563) — black in F12, F13 and F14 ---------- */
+.studio-label {
+  position: absolute;
+  left: 886px;
+  top: 177px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.26;
+  color: #000;
+  white-space: nowrap;
+}
+
+/* ---------- Chrome ---------- */
+
+.logo { position: absolute; left: 20px; top: 24px; width: 100px; height: 100px; object-fit: cover; }
+
+.social { position: absolute; left: 1776px; top: 40px; display: flex; gap: 16px; }
+.social__icon { position: relative; width: 24px; height: 24px; overflow: hidden; }
+.social__icon img { position: absolute; left: 0; top: 0; width: 24px; height: 24px;
+                    transition: opacity var(--chrome-dur) var(--chrome-ease); }
+.social__f13 { opacity: 0; }
+
+/* Scroll hint: the visible (top) "( Scroll )" layer is white in F12, F13 and F14 */
+.scroll-hint {
+  position: absolute;
+  left: 69px;
+  top: 1027px;
+  transform: translateX(-50%);
+  font-family: 'Syne', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--c-white);
+  transition: color var(--chrome-dur) var(--chrome-ease);
+}
+
+.nav {
+  position: absolute;
+  left: 880px;
+  top: 978px;
+  width: 160px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  border-radius: 49px;
+  background-color: var(--c-black);
+  transition: background-color var(--chrome-dur) var(--chrome-ease);
+}
+.nav__label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--c-white);
+  white-space: nowrap;
+  transition: color var(--chrome-dur) var(--chrome-ease);
+}
+.nav__icon { position: relative; flex-shrink: 0; width: 30px; height: 30px; overflow: hidden; }
+.nav__icon i { position: absolute; left: 0; width: 40px; height: 2px; background-color: var(--c-white);
+               transition: background-color var(--chrome-dur) var(--chrome-ease); }
+.nav__icon i:nth-child(1) { top: 8px; }
+.nav__icon i:nth-child(2) { top: 14px; }
+.nav__icon i:nth-child(3) { top: 20px; }
+
+/* F13 / F14 chrome (Navigation 30:665, Social Links 30:672, Scroll Hint 30:664) */
+.viewport.is-chrome-f13 .nav         { background-color: var(--c-yellow); }
+.viewport.is-chrome-f13 .nav__label  { color: var(--c-black); }
+.viewport.is-chrome-f13 .nav__icon i { background-color: var(--c-black); }
+.viewport.is-chrome-f13 .social__f12 { opacity: 0; }
+.viewport.is-chrome-f13 .social__f13 { opacity: 1; }
+.viewport.is-chrome-f13 .scroll-hint { color: var(--c-white); }
+
+/* ---------- Reduced motion / no WebGL: each step crossfades ---------- */
+.viewport.is-reduced .scene--f13 { clip-path: none; opacity: 0; transition: opacity var(--fade) ease; }
+.viewport.is-reduced.is-filled .scene--f13 { opacity: 1; }
+.viewport.is-fade .title2--f13,
+.viewport.is-fade .title2--f14 { visibility: visible; transition: opacity var(--fade) ease; }
+.viewport.is-fade .title2--f14 { opacity: 0; }
+.viewport.is-fade.is-f14 .title2--f13 { opacity: 0; }
+.viewport.is-fade.is-f14 .title2--f14 { opacity: 1; }
+
+/* Character crossfade (reduced motion / no WebGL) */
+.viewport.is-fade .character { visibility: visible; opacity: 0; transition: opacity var(--fade) ease; }
+.viewport.is-fade.is-char .character { opacity: 1; }

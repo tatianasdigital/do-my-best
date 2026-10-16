@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- YouTube embeds need the page origin as referrer (otherwise "Error 153") -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>DO MY BEST — First screen, Liquid Flow black hole (F12 → F14)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Manrope:wght@500&family=Syne:wght@400;600&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!--
+    Figma file 78XlrFPw66iWdkqGPpQ2ua, Page 3:
+      F12 (30:515) first screen — yellow, dark "WORLD / BUILDERS."
+      F14 (30:573) after scroll — #E3F14A "WORLD / DESTROYERS." over a background video
+    burn3 = "black hole": on scroll a hole opens in the centre and F12 twists into a
+    funnel around it, dragged inwards along a spiral and swallowed while the hole grows
+    (Liquid Flow v1.3, vortex). Bottom → top:
+      scene--f14   : the complete F14 screen (background video + content + chrome)
+      scene--f12   : the complete F12 screen (incl. its chrome, title entrance masks)
+      burn-canvas  : WebGL — a snapshot of F12 melting away (raster.js + liquid-flow.js)
+  -->
+  <main class="viewport" id="viewport" data-state="intro" aria-label="DO MY BEST — World builders. World destroyers.">
+
+    <!-- F14 (underneath) -->
+    <div class="scene scene--f14" aria-hidden="true">
+      <!-- Background video instead of the flat fill (YouTube player, muted, from 0:25, looping).
+           The black fill stays underneath as the fallback until the video is ready. -->
+      <div class="bg-video"><div id="bg-video-player"></div></div>
+      <!-- 15 % black layer over the video -->
+      <div class="bg-shade"></div>
+      <div class="stage">
+        <p class="studio-label">INDIE GAME STUDIO</p>
+        <!-- Same entrance as F12: each title slides out of an invisible mask as wide as its text
+             (Title1 from the left edge, Title2 from the right) once ~85 % of F14 is revealed -->
+        <div class="title-mask title-mask--1 title-mask--f14"><span class="title-text title-text--f14 title1--f14">World</span></div>
+        <div class="title-mask title-mask--2 title-mask--f14"><span class="title-text title-text--f14 title2--f14">destroyers.</span></div>
+        <img class="logo" src="../assets/logo.png" width="100" height="100" alt="">
+        <div class="social">
+          <span class="social__icon"><img src="assets/f13-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f13-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="assets/f13-social-icon.svg" width="24" height="24" alt=""></span>
+        </div>
+        <p class="scroll-hint">( Scroll )</p>
+        <div class="nav nav--f14"><span class="nav__label">menu</span><span class="nav__icon"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+
+    <!-- F12 (on top) -->
+    <div class="scene scene--f12">
+      <div class="stage">
+        <p class="studio-label">INDIE GAME STUDIO</p>
+        <!-- Each title sits in an invisible mask exactly as wide as its text:
+             Title1 slides out of the mask's left edge, Title2 out of its right edge. -->
+        <div class="title-mask title-mask--1 title-mask--f12"><span class="title-text">World</span></div>
+        <div class="title-mask title-mask--2 title-mask--f12"><span class="title-text">BUILDERS.</span></div>
+        <img class="logo" src="../assets/logo.png" width="100" height="100" alt="DO MY BEST">
+        <div class="social" aria-label="Social links">
+          <span class="social__icon"><img src="../assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="../assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img src="../assets/f01-social-icon.svg" width="24" height="24" alt=""></span>
+        </div>
+        <p class="scroll-hint">( Scroll )</p>
+        <div class="nav nav--f12"><span class="nav__label">menu</span><span class="nav__icon"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+
+    <canvas class="burn-canvas" aria-hidden="true"></canvas>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="liquid-flow.js"></script>
+  <script src="raster.js"></script>
+  <script src="video.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

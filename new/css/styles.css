@@ -1,0 +1,1241 @@
+/* =====================================================================
+   DO MY BEST — desktop website (Figma 78XlrFPw66iWdkqGPpQ2ua · HomePageDesktop 75:1130)
+
+   FLUID LAYOUT
+   Every Figma measurement is written as N × var(--u). --u is "one Figma pixel"
+   at the current viewport: the 1920 × 1080 frame scaled to fit the window
+   (min of width / 1920 and height / 1080). So proportions are preserved at any
+   desktop size, while each section still anchors its content to the real
+   viewport edges (left/right margins, top, bottom, centre) — nothing is scaled
+   as one picture. Small UI text has a readable floor (--fs-16, --fs-13).
+   Settings: the variables in :root below.
+   ===================================================================== */
+
+:root {
+  --u: min(calc(100vw / 1920), calc(100vh / 1080));
+  --c-black: #0e0f0e;
+  --c-yellow: #e3f14a;
+  --c-white: #ffffff;
+  --c-icon-dark: #09121f;
+  --fs-16: max(12px, calc(16 * var(--u)));   /* 16px UI text, never below 12px */
+  --fs-13: max(10px, calc(13 * var(--u)));   /* 13px labels, never below 10px */
+  --margin: calc(40 * var(--u));             /* page side margin (Figma 40) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --font-display: 'Boldonse', sans-serif;
+  --font-ui: 'Space Grotesk', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+  --page-bg: var(--c-black);       /* page colour theme (moyra.co-style): neighbouring sections share it */
+  --theme-ms: 800ms;
+}
+/* GamesSection switches the whole page area around it (About + Games) to lime */
+html.theme-lime { --page-bg: var(--c-yellow); }
+@supports (height: 100svh) {
+  :root { --u: min(calc(100vw / 1920), calc(100svh / 1080)); }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html {
+  background: var(--c-black);
+  /* the native scrollbar is hidden (wheel, keys and the smooth scroller still scroll the page),
+     so locking the scroll never shifts the layout and 100vw is the real width */
+  scrollbar-width: none;
+  -webkit-text-size-adjust: 100%;
+}
+html::-webkit-scrollbar { display: none; }
+html.is-locked { overflow: hidden; }
+body {
+  font-family: var(--font-ui);
+  color: var(--c-white);
+  background: var(--page-bg);       /* --page-bg is animated frame by frame by games.js (no CSS transition) */
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+img, svg { display: block; }
+img { max-width: none; user-select: none; -webkit-user-drag: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+ul { list-style: none; }
+svg { fill: currentColor; }
+:focus-visible { outline: 2px solid var(--c-yellow); outline-offset: 3px; }
+
+.skip-link {
+  position: fixed; left: 8px; top: -60px; z-index: 200;
+  padding: 10px 14px; background: var(--c-yellow); color: var(--c-black); font-size: 14px; border-radius: 8px;
+}
+.skip-link:focus { top: 8px; }
+
+/* Discord / X artwork: Figma uses an image mask filled with a colour → mask + currentColor */
+.mask-icon {
+  display: block;
+  background-color: currentColor;
+  -webkit-mask: var(--mask) center / contain no-repeat;
+          mask: var(--mask) center / contain no-repeat;
+}
+.mask-icon--discord { --mask: url('../assets/discord-mask.png'); width: calc(24.5 * var(--u)); height: calc(24.5 * var(--u)); }
+.mask-icon--x { --mask: url('../assets/x-mask.png'); width: calc(21.875 * var(--u)); height: calc(19.82 * var(--u)); }
+.mask-icon--discord-lg { --mask: url('../assets/discord-mask-large.png'); }
+
+/* =====================================================================
+   FIXED CHROME
+   ===================================================================== */
+
+/* ---------- TopBar (48:1496); "bright" = TopBarBright 75:748 over the yellow first screen ---------- */
+.topbar {
+  position: fixed;
+  z-index: 80;
+  left: var(--margin);
+  right: var(--margin);
+  top: calc(20 * var(--u));
+  height: calc(100 * var(--u));
+  pointer-events: none;
+  color: var(--c-white);
+  transition: opacity 400ms ease, visibility 0s linear 0s, transform 400ms var(--ease-out);
+}
+.topbar[data-theme="bright"] { transform: translateY(calc(4 * var(--u))); }   /* TopBarBright sits at y 24, TopBar at y 20 */
+.topbar > * { pointer-events: auto; }
+.topbar__logo { position: absolute; left: 0; top: 0; width: calc(100.27 * var(--u)); aspect-ratio: 1; }
+.topbar__logo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 350ms ease; }
+.topbar__logo-img--dark { opacity: 0; }
+.topbar__actions {
+  position: absolute;
+  right: 0;
+  top: calc(8 * var(--u));
+  height: calc(48 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(38 * var(--u));
+}
+.social-icons { display: flex; align-items: center; gap: calc(28 * var(--u)); }
+.social-icon {
+  display: grid; place-items: center;
+  width: calc(28 * var(--u)); height: calc(28 * var(--u));
+  min-width: 20px; min-height: 20px;
+  color: inherit;
+  transition: color 350ms ease, opacity 200ms ease;
+}
+.social-icon:hover { opacity: 0.7; }
+.social-icon__svg { width: 100%; height: 100%; }
+.social-icon .mask-icon--discord { width: 87.5%; height: 87.5%; }
+.social-icon .mask-icon--x { width: 78%; height: 71%; }
+
+.top-button {
+  display: flex;
+  align-items: center;
+  gap: calc(25 * var(--u));
+  height: calc(56 * var(--u));
+  min-height: 40px;
+  padding: 0 calc(7 * var(--u)) 0 calc(20 * var(--u));
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: calc(49 * var(--u));
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  --hover-fill: var(--c-white);          /* TopButtonHover (92:449) on dark backgrounds */
+  transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+/* hover fills (TopButton, Navigation): a pill with the button's own radius slides in from
+   the left — translate (not scale) keeps its rounded leading edge; ease-in-out */
+.top-button::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--hover-fill);
+  transform: translateX(-101%);
+  transition: transform var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.top-button:hover::before, .top-button:focus-visible::before { transform: translateX(0); }
+.top-button:hover, .top-button:focus-visible { border-color: var(--c-white); color: var(--c-black); }
+.top-button:hover .top-button__icon, .top-button:focus-visible .top-button__icon { background: var(--c-black); color: var(--c-white); }
+.top-button__text {
+  font-weight: 500; font-size: var(--fs-16); line-height: 1; text-transform: uppercase; white-space: nowrap; min-width: calc(108 * var(--u));
+  /* trim the line box to the capital letters, so flex centring puts the caps exactly in the middle
+     (the font's ascender/descender space is uneven) */
+  text-box: trim-both cap alphabetic;
+}
+.top-button__icon {
+  display: grid; place-items: center;
+  width: calc(40 * var(--u)); height: calc(40 * var(--u)); min-width: 28px; min-height: 28px;
+  border-radius: 50%;
+  background: var(--c-white);
+  color: var(--c-icon-dark);
+  transition: background-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.top-button__icon svg { width: 50%; height: 50%; }   /* ContactArrowIcon: no motion on hover */
+
+.topbar[data-theme="bright"] { color: var(--c-black); }
+.topbar[data-theme="bright"] .topbar__logo-img--dark { opacity: 1; }
+.topbar[data-theme="bright"] .topbar__logo-img--yellow { opacity: 0; }
+.topbar[data-theme="bright"] .top-button { border-color: var(--c-black); }
+.topbar[data-theme="bright"] .top-button__icon { background: var(--c-black); color: var(--c-yellow); }
+/* TopButtonHover1 (92:440) on lime: dark pill, lime text, lime circle with a dark arrow */
+.topbar[data-theme="bright"] .top-button { --hover-fill: var(--c-black); }
+.topbar[data-theme="bright"] .top-button:hover, .topbar[data-theme="bright"] .top-button:focus-visible { border-color: var(--c-black); color: var(--c-yellow); }
+.topbar[data-theme="bright"] .top-button:hover .top-button__icon, .topbar[data-theme="bright"] .top-button:focus-visible .top-button__icon { background: var(--c-yellow); color: var(--c-black); }
+
+/* hidden over the footer (it has its own logo, links and socials in the same places) */
+.topbar.is-hidden { opacity: 0; visibility: hidden; transition: opacity 300ms ease, visibility 0s linear 300ms; }
+
+/* ---------- NavigationNew (116:1915): About · Our games · Contact, 366 × 64, bottom centre ----------
+   Dark theme: transparent, white text, 1px white 30 % outline. Hovered item (117:509): a pill with
+   the item's own radius slides in from the left (ease-in-out) — white, text #0E0F0E.
+   Over #E3F14A (data-theme="bright", set by chrome.js): text and outline #0E0F0E; hovered item
+   (117:514) fills #0E0F0E with #E3F14A text. */
+.navigation {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  bottom: calc(40 * var(--u));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: stretch;
+  height: calc(64 * var(--u));
+  min-height: 48px;
+  padding: calc(4 * var(--u));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: calc(49 * var(--u));
+  -webkit-backdrop-filter: blur(12px);   /* the page underneath is softly blurred */
+          backdrop-filter: blur(12px);
+  color: var(--c-white);
+  --nav-fill: var(--c-white);
+  --nav-fill-text: var(--c-black);
+  transition: color 150ms ease, border-color 150ms ease, opacity 300ms ease;
+}
+.navigation[data-theme="bright"] { color: var(--c-black); border-color: var(--c-black); --nav-fill: var(--c-black); --nav-fill-text: var(--c-yellow); }
+.navigation__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 calc(24 * var(--u));
+  border-radius: calc(60 * var(--u));
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* the hover fill is a copy of the item (pill + text in the fill colours) revealed from the left by
+   a rounded clip — so the text inverts exactly under the fill, and the theme colours themselves
+   can switch quickly (150 ms) without waiting for the 700 ms hover animation */
+.navigation__fill {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: inherit;
+  border-radius: inherit;
+  background: var(--nav-fill);
+  color: var(--nav-fill-text);
+  clip-path: inset(0 100% 0 0 round calc(60 * var(--u)));
+  transition: clip-path 450ms var(--ease-in-out), background-color 150ms ease, color 150ms ease;
+  pointer-events: none;
+}
+.navigation__item:hover .navigation__fill, .navigation__item:focus-visible .navigation__fill { clip-path: inset(0 0 0 0 round calc(60 * var(--u))); }
+.navigation__item span { text-box: trim-both cap alphabetic; }
+.navigation.is-hidden { opacity: 0; visibility: hidden; transition: opacity 300ms ease, visibility 0s linear 300ms; }
+
+/* ---------- Navigation overlay (Modal 75:1539) ---------- */
+.nav-overlay { position: fixed; inset: 0; z-index: 90; }
+.nav-overlay[hidden] { display: none; }
+.nav-overlay__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(14, 15, 14, 0);
+  -webkit-backdrop-filter: blur(0px);
+          backdrop-filter: blur(0px);
+  transition: background-color var(--nav-blur-ms, 380ms) ease, -webkit-backdrop-filter var(--nav-blur-ms, 380ms) ease, backdrop-filter var(--nav-blur-ms, 380ms) ease;
+}
+.nav-overlay.is-blurred .nav-overlay__backdrop {
+  background: rgba(14, 15, 14, 0.35);
+  -webkit-backdrop-filter: blur(14px);
+          backdrop-filter: blur(14px);
+}
+/* the panel sits so that its NavigationClose slot (x centre, 32px above its bottom edge)
+   is exactly where the fixed Navigation button is */
+.nav-overlay__panel {
+  position: absolute;
+  left: 50%;
+  /* Modal (75:1539): padding 56 · 56 · 16; 941 content + 2 × 56 + 2 × 1 border = 1055;
+     56 + 400 covers + 56 gap + 69 NavigationClose + 16 + 2 = 599. The fixed Navigation
+     (bottom 40) is its NavigationClose, so the panel sits 16 + 1 below it. */
+  bottom: calc(23 * var(--u));
+  width: calc(1055 * var(--u));
+  height: calc(599 * var(--u));
+  transform: translate(-50%, calc(24 * var(--u))) scale(0.97);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  background: var(--c-black);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: calc(32 * var(--u));
+  transition: opacity 320ms ease, transform 480ms var(--ease-out);
+}
+.nav-overlay.is-panel .nav-overlay__panel { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.nav-games {
+  position: absolute;
+  left: calc(56 * var(--u));
+  top: calc(56 * var(--u));
+  display: flex;
+  gap: calc(20 * var(--u));
+}
+.nav-game { opacity: 0; transform: translateY(calc(28 * var(--u))); transition: opacity 360ms ease, transform 520ms var(--ease-out); }
+.nav-overlay.is-games .nav-game { opacity: 1; transform: none; }
+.nav-overlay.is-games .nav-game:nth-child(2) { transition-delay: 70ms; }
+.nav-overlay.is-games .nav-game:nth-child(3) { transition-delay: 140ms; }
+.nav-game__cover {
+  position: relative;
+  display: block;
+  width: calc(300 * var(--u));
+  height: calc(400 * var(--u));
+  overflow: hidden;
+  border-radius: calc(12 * var(--u));
+}
+.nav-game__cover img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease-out); }
+.nav-game__cover:hover img { transform: scale(1.04); }
+.nav-game--final-station .nav-game__cover { width: calc(301 * var(--u)); border: 1px solid rgba(255, 255, 255, 0.3); }
+.nav-game--final-station img { left: calc(-2 * var(--u)); top: calc(-26 * var(--u)); width: calc(301 * var(--u)); height: calc(451 * var(--u)); }
+.nav-game--only-traitor img { left: calc(50% - 10 * var(--u)); width: calc(400 * var(--u)); height: calc(400 * var(--u)); translate: -50% 0; }
+
+/* ---------- Cursor trail ---------- */
+.cursor-trail { position: fixed; inset: 0; z-index: 70; width: 100%; height: 100%; pointer-events: none; transition: opacity 220ms ease; }
+.cursor-trail.is-off { opacity: 0; }   /* over buttons and links */
+
+/* =====================================================================
+   FIRST SCREEN (FirstScreen1 → FirstScreen2)
+   ===================================================================== */
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--c-black);
+}
+.hero__scene { position: absolute; inset: 0; overflow: hidden; }
+.hero__scene--f2 { z-index: 1; background: var(--c-black); }
+.hero__scene--f1 { z-index: 2; background: var(--c-yellow); }
+/* F1 is hidden with opacity (not visibility) so the rasteriser can still read its layout */
+.hero.is-f1-hidden .hero__scene--f1 { opacity: 0; pointer-events: none; }
+.hero.is-fade .hero__scene--f1 { transition: opacity var(--fade, 300ms) ease; }
+.burn-canvas { position: absolute; z-index: 3; pointer-events: none; visibility: hidden; }
+.hero.is-burning .burn-canvas { visibility: visible; }
+
+.hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* #0E0F0E at 15 % over the FirstScreen2 background video */
+.hero__shade { position: absolute; inset: 0; background: var(--c-black); opacity: var(--hero-shade, 0.15); pointer-events: none; }
+
+/* vertical positions are relative to the viewport centre (Figma y − 540) */
+.studio-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (200 - 540) * var(--u));
+  transform: translateX(-50%);
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1.26;
+  white-space: nowrap;
+}
+.studio-label--f1 { color: #000; }
+.studio-label--f2 { color: var(--c-yellow); }
+
+/* Headline: Boldonse 200 / 1.4, each line in an invisible entrance mask (sized by hero.js) */
+.title-mask {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: calc(280 * var(--u));
+  overflow: hidden;
+}
+.title-mask--1 { top: calc(50% + (252 - 540) * var(--u)); }
+.title-mask--2 { top: calc(50% + (532 - 540) * var(--u)); }
+.title-text {
+  position: absolute;
+  top: 0;
+  display: block;
+  height: calc(280 * var(--u));
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: calc(200 * var(--u));
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+}
+.title-text--f1 { color: var(--c-black); }
+.title-text--f2 { color: var(--c-yellow); }
+
+
+.hero-scroll {
+  position: absolute;
+  right: calc(49 * var(--u));
+  bottom: calc(40 * var(--u));
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.hero-scroll--f1 { color: var(--c-black); }
+.hero-scroll--f2 { color: var(--c-white); }
+
+.playing-now { position: absolute; left: calc(41 * var(--u)); bottom: calc(40 * var(--u)); display: flex; flex-direction: column; gap: calc(4 * var(--u)); }
+.playing-now__label { font-weight: 500; font-size: var(--fs-13); line-height: 1; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+/* PlayingNowTitleContainer (108:1391): white text, a thin 40 % white line under it that fills
+   with #FFFFFF from left to right on hover */
+.playing-now__title { position: relative; display: inline-flex; flex-direction: column; align-items: flex-start; gap: calc(4 * var(--u)); color: var(--c-white); font-weight: 500; font-size: var(--fs-16); line-height: 1; text-transform: uppercase; }
+.playing-now__text { white-space: nowrap; }
+.playing-now__line { position: relative; display: block; width: 100%; height: 1px; overflow: hidden; background: rgba(255, 255, 255, 0.4); }
+.playing-now__line::before { content: ''; position: absolute; inset: 0; background: var(--c-white); transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--hover-ms, 700ms) var(--ease-in-out); }
+.playing-now__title:hover .playing-now__line::before, .playing-now__title:focus-visible .playing-now__line::before { transform: scaleX(1); }
+
+/* =====================================================================
+   ABOUT (73:2507) — pinned stage; height set by about.js (one scroll stage per line)
+   ===================================================================== */
+.about { position: relative; background: var(--page-bg); height: 300vh; }
+.about__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.reading-progress {
+  position: absolute;
+  left: var(--margin);
+  right: var(--margin);
+  top: calc(184 * var(--u));
+  height: 1px;
+  background: rgba(255, 255, 255, 0.17);
+}
+.reading-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--c-yellow);
+  border-radius: 42px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 520ms var(--ease-out);
+}
+.about__content {
+  position: absolute;
+  left: var(--margin);
+  top: calc(297 * var(--u));   /* ReadingProgressBar (184) + 1 + gap 112 (Figma 152, reduced by 40) */
+  display: flex;
+  align-items: flex-start;
+  gap: calc(218 * var(--u));
+}
+.about__label {
+  width: calc(92 * var(--u));
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.about__text {
+  width: calc(1377 * var(--u));
+  font-weight: 500;
+  font-size: calc(96 * var(--u));
+  line-height: 1;
+  color: #434343;                 /* not yet read → #E3F14A line by line */
+}
+/* Each line fills from left to right like a sweep (about.js animates --fill 0 → 1 per word,
+   one eased run across the whole line): read part --about-lit, the rest #434343 */
+@property --about-lit { syntax: '<color>'; inherits: true; initial-value: #e3f14a; }
+.about__text { --about-lit: var(--c-yellow); transition: --about-lit var(--theme-ms) ease; }
+.about__text .w {
+  --fill: 0;
+  color: transparent;
+  background: linear-gradient(90deg, var(--about-lit) calc(var(--fill) * 100%), #434343 calc(var(--fill) * 100%));
+  -webkit-background-clip: text;
+          background-clip: text;
+}
+/* About on the lime page theme: the read lines, label and progress bar turn dark */
+.about__label, .reading-progress, .reading-progress__fill { transition-property: color, background-color, transform; transition-duration: var(--theme-ms), var(--theme-ms), 520ms; }
+html.theme-lime .about__label { color: var(--c-black); }
+html.theme-lime .about__text { --about-lit: var(--c-black); }
+html.theme-lime .reading-progress { background: rgba(14, 15, 14, 0.17); }
+html.theme-lime .reading-progress__fill { background: var(--c-black); }
+
+/* =====================================================================
+   GAMES (73:2509 + GameSection1–3) — pinned stage, scroll-driven by games.js
+   ===================================================================== */
+.games { position: relative; background: var(--page-bg); height: 500vh; }
+.games__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--page-bg);       /* lime from arriving at GamesSection through all GamesShowcase blocks */
+}
+
+/* intro: the 640px GamesSection block is centred vertically in the stage */
+.games-intro { position: absolute; inset: 0; z-index: 1; pointer-events: none; color: var(--c-white); transition: color var(--theme-ms) ease; }
+html.theme-lime .games-intro { color: var(--c-black); }
+.games-intro__label {
+  position: absolute;
+  left: var(--margin);
+  top: calc(50% + (84 - 320) * var(--u));
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.games-intro__title {
+  position: absolute;
+  left: var(--margin);
+  top: calc(50% + (200 - 320) * var(--u));
+  font-family: var(--font-display);
+  font-size: calc(200 * var(--u));
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* GamesTitle: endless marquee, right → left. Two identical copies (each ending with a space);
+   the track moves by exactly one copy (-50 %) and starts over, so the loop has no seam */
+.games-intro__track { display: inline-flex; white-space: pre; animation: games-marquee var(--marquee-s, 30s) linear infinite; will-change: transform; }
+@keyframes games-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .games-intro__track { animation: none; } }
+
+/* GamesNewImage (109:1542): TheFinalStationSection's background seen through a centred circle,
+   Ø604 at the start; games.js grows its radius (--reveal-r) with the scroll until it covers the
+   screen and the block simply is TheFinalStationSection */
+.games-video {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: var(--c-black);
+  clip-path: circle(var(--reveal-r, calc(302 * var(--u))) at 50% 50%);
+  will-change: clip-path;
+}
+.games-video__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* YouTube background players (hero, games): shown only while actually playing */
+.bg-video { position: absolute; inset: 0; overflow: hidden; opacity: 0; transition: opacity 500ms ease; pointer-events: none; }
+.bg-video.is-ready { opacity: 1; }
+.bg-video iframe { position: absolute; left: 50%; top: 50%; border: 0; transform: translate(-50%, -50%); }
+
+.games-shadow {
+  position: absolute;
+  z-index: 3;
+  left: -3.6%;
+  top: -13%;
+  width: 103.6%;
+  height: 114.4%;
+  pointer-events: none;
+  opacity: 0.5;               /* Shadow at 50 % (config.games.shadowOpacity for the first block) */
+}
+.games-shadow--reveal { opacity: 0; }
+/* ---------- Game states: each one is a whole block (video + shadow + content) ----------
+   The next block slides up over the current one; the current block — video included —
+   shrinks, darkens and moves into the background. */
+.game-block {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  background: var(--c-yellow);
+  /* corners are cut with clip-path (border-radius + overflow does not reliably clip the
+     YouTube iframe / clipped video layers inside) */
+  clip-path: inset(0 round 0px);
+  transition:
+    transform var(--gs-ms, 900ms) var(--ease-in-out),
+    filter var(--gs-ms, 900ms) ease,
+    clip-path var(--gs-ms, 900ms) var(--ease-in-out),
+    visibility 0s linear var(--gs-ms, 900ms);
+}
+.game-block[data-game="1"] { z-index: 2; background: transparent; }
+.game-block[data-game="2"] { z-index: 3; }
+.game-block[data-game="3"] { z-index: 4; }
+.game-block[data-game="2"], .game-block[data-game="3"] { transform: translateY(100%); visibility: hidden; }
+.game-block.is-current, .game-block.is-behind { visibility: visible; transition-delay: 0s; }
+.game-block.is-current { transform: none; }
+.game-block.is-behind {
+  transform: scale(var(--gs-behind-scale, 0.9));
+  filter: brightness(var(--gs-behind-dark, 0.35));
+  /* 32px corners as seen on screen: the radius is divided by the scale it is shown at */
+  clip-path: inset(0 round calc(32px / var(--gs-behind-scale, 0.9)));
+}
+.game-bg { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+.game-bg__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* content of a block: rises in once its block is current, then stays part of the block */
+.game-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(60 * var(--u)));
+  transition:
+    opacity 600ms ease,
+    transform 800ms var(--ease-out),
+    visibility 0s linear 800ms;
+}
+.game-block.is-current .game-layer {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity 600ms ease 300ms, transform 800ms var(--ease-out) 300ms, visibility 0s;
+}
+.game-block.is-behind .game-layer { opacity: 1; visibility: visible; transform: none; transition: none; }
+.game-layer__top {
+  position: absolute;
+  left: var(--margin);
+  top: calc(176 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.game-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: calc(96 * var(--u));
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--c-white);
+  white-space: nowrap;
+}
+.game-tags { display: flex; align-items: center; gap: calc(9 * var(--u)); margin-top: calc(20 * var(--u)); }
+.game-tags li { display: flex; align-items: center; gap: calc(9 * var(--u)); font-weight: 500; font-size: var(--fs-13); line-height: 1; text-transform: uppercase; white-space: nowrap; }
+.game-tags li + li::before {
+  content: '';
+  width: calc(4 * var(--u)); height: calc(4 * var(--u)); min-width: 3px; min-height: 3px;
+  margin: 0 calc(4 * var(--u));
+  border-radius: 50%;
+  background: var(--c-yellow);
+}
+.game-buttons { display: flex; align-items: flex-start; gap: calc(12 * var(--u)); margin-top: calc(62 * var(--u)); }
+
+.main-button {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: calc(24 * var(--u));
+  height: calc(64 * var(--u));
+  min-height: 44px;
+  padding: 0 calc(4 * var(--u)) 0 calc(32 * var(--u));
+  border-radius: calc(49 * var(--u));
+  background: var(--c-yellow);
+  color: var(--c-black);
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.main-button__icon {
+  position: relative;
+  display: grid; place-items: center;
+  width: calc(52 * var(--u)); height: calc(52 * var(--u)); min-width: 36px; min-height: 36px;
+  border-radius: 50%;
+  background: var(--c-black);
+  color: var(--c-yellow);
+}
+.main-button__icon svg { grid-area: 1 / 1; width: 46%; height: 46%; transition: opacity 220ms ease, transform 420ms var(--ease-out); }
+.main-button__close { opacity: 0; transform: rotate(-90deg); }
+.main-button:hover .main-button__arrow { transform: translate(8%, -8%); }
+.buy.is-open .main-button__arrow { opacity: 0; transform: rotate(90deg); }
+.buy.is-open .main-button__close { opacity: 1; transform: none; }
+
+.sec-button {
+  display: flex;
+  align-items: center;
+  height: calc(64 * var(--u));
+  min-height: 44px;
+  padding: 0 calc(32 * var(--u));
+  border: 1px solid var(--c-yellow);
+  border-radius: calc(62 * var(--u));
+  color: var(--c-yellow);
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+.sec-button:hover { background: var(--c-yellow); color: var(--c-black); }
+
+/* ---------- MainButton mini modal (BuyNowDropdown 74:539): grows upwards out of the button ---------- */
+.buy { position: relative; }
+.buy__menu {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(258 * var(--u));
+  min-height: 210px;
+  padding: calc(4 * var(--u));
+  background: var(--c-yellow);
+  border: 1px solid var(--c-yellow);
+  border-radius: calc(27 * var(--u));
+  clip-path: inset(calc(100% - max(44px, 64 * var(--u))) 0 0 0 round calc(32 * var(--u)));
+  transition: clip-path 460ms var(--ease-out);
+}
+.buy__menu[hidden] { display: block; visibility: hidden; }
+.buy.is-open .buy__menu { clip-path: inset(0 0 0 0 round calc(27 * var(--u))); }
+.buy__stores { display: flex; flex-direction: column; gap: calc(4 * var(--u)); }
+.buy__stores li { opacity: 0; transform: translateY(calc(14 * var(--u))); transition: opacity 220ms ease, transform 380ms var(--ease-out); }
+.buy.is-open .buy__stores li { opacity: 1; transform: none; }
+.buy.is-open .buy__stores li:nth-child(3) { transition-delay: 60ms; }
+.buy.is-open .buy__stores li:nth-child(2) { transition-delay: 120ms; }
+.buy.is-open .buy__stores li:nth-child(1) { transition-delay: 180ms; }
+.store-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10 * var(--u));
+  height: calc(56 * var(--u));
+  min-height: 40px;
+  border-radius: calc(46 * var(--u));
+  background: var(--c-black);
+  color: var(--c-white);
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 200ms ease;
+}
+.store-button svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 18px; min-height: 18px; }
+.store-button:hover { color: var(--c-yellow); }
+.store-button[aria-disabled="true"] { cursor: default; }
+
+.available {
+  position: absolute;
+  left: var(--margin);
+  bottom: calc(46 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+}
+.available__label { font-weight: 500; font-size: var(--fs-13); line-height: 1; text-transform: uppercase; color: rgba(255, 255, 255, 0.61); }
+.available__icons { display: flex; align-items: center; gap: calc(24 * var(--u)); }
+.badge { height: calc(32 * var(--u)); object-fit: cover; }
+.badge--ps4 { width: calc(153 * var(--u)); }
+.badge--xbox { width: calc(161 * var(--u)); }
+.badge--pc { width: calc(45 * var(--u)); }
+
+/* ---------- SmallProgressBar: exactly three segments, Figma fill widths 140 / 296 / 600 of 600 ---------- */
+.small-progress {
+  position: absolute;
+  z-index: 7;
+  right: var(--margin);
+  bottom: calc(74 * var(--u));
+  width: calc(600 * var(--u));
+  height: 1px;
+  display: flex;
+  background: rgba(255, 255, 255, 0.17);
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.games.is-revealed .small-progress { opacity: 1; }
+.small-progress__seg { position: relative; height: 100%; }
+.small-progress__seg:nth-child(1) { flex: 140 0 0; }
+.small-progress__seg:nth-child(2) { flex: 156 0 0; }
+.small-progress__seg:nth-child(3) { flex: 304 0 0; }
+.small-progress__seg i {
+  position: absolute;
+  inset: 0;
+  background: var(--c-yellow);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 600ms var(--ease-out);
+}
+.small-progress__seg.is-filled i { transform: scaleX(1); }
+.small-progress__seg:first-child i { border-radius: 42px 0 0 42px; }
+.small-progress__seg:last-child i { border-radius: 0 42px 42px 0; }
+
+/* =====================================================================
+   DISCORD (48:1025)
+   ===================================================================== */
+.discord {
+  position: relative;
+  z-index: 2;                 /* slides up over the pinned TheBookwalkerSection … */
+  margin-top: -100vh;         /* … during the extra last screen of GamesSection (games.js) */
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--c-black);
+}
+/* CommunityCharacter (108:1537): art-guy, already mirrored and cropped in the file,
+   755 × 998 at x 905 / y 99 of the 1920 × 1080 frame (its feet run off the bottom) */
+.discord__character {
+  position: absolute;
+  left: calc(50% + (905 - 960) * var(--u));
+  top: calc(50% + (99 - 540) * var(--u));
+  width: calc(755 * var(--u));
+  height: calc(998 * var(--u));
+  pointer-events: none;
+}
+/* Rectangle 20: the legs fade into the background (#0E0F0E from 22 % → transparent, upwards) */
+.discord__fade {
+  position: absolute;
+  left: calc(50% + (1257 - 960) * var(--u));
+  top: calc(50% + (801 - 540) * var(--u));
+  width: calc(378 * var(--u));
+  height: calc(279 * var(--u));
+  background: linear-gradient(to top, #0e0f0e 22.321%, rgba(14, 15, 14, 0));
+  pointer-events: none;
+}
+.discord__text {
+  position: absolute;
+  left: var(--margin);
+  top: calc(200 * var(--u));
+  width: max(260px, calc(360 * var(--u)));
+  font-size: var(--fs-16);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.discord__label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (369 - 540) * var(--u));
+  transform: translateX(-50%);
+  font-size: var(--fs-16);
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.discord-button {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (423 - 540) * var(--u));
+  transform: translateX(-50%);
+  width: calc(1043 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(37 * var(--u));
+  padding: calc(32 * var(--u)) 0 calc(32 * var(--u)) calc(52 * var(--u));
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: calc(213 * var(--u));
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--c-white);
+  transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+/* DiscordButtonHover (48:1421): the lime fill sweeps in from left to right */
+/* the fill is a pill with the button's own corner radius that slides in from the left
+   (translate, not scale, so its rounded leading edge keeps its shape);
+   ease-in-out: smooth acceleration, smooth deceleration */
+.discord-button::before,
+.footer-button::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--c-yellow);
+  transform: translateX(-101%);
+  transition: transform var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.discord-button__logo { flex: none; width: calc(155 * var(--u)); height: calc(155 * var(--u)); -webkit-mask-size: 87.5%; mask-size: 87.5%; transition: background-color var(--hover-ms, 700ms) var(--ease-in-out); }
+.discord-button__title {
+  flex: none;
+  width: calc(564 * var(--u));
+  font-family: var(--font-display);
+  font-size: calc(96 * var(--u));
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.discord-button__circle {
+  flex: none;
+  display: grid; place-items: center;
+  width: calc(160 * var(--u)); height: calc(160 * var(--u));
+  border-radius: 50%;
+  background: var(--c-white);
+  color: var(--c-icon-dark);
+  transition: background-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.discord-button__circle svg { width: calc(75 * var(--u)); height: calc(75 * var(--u)); }
+.discord-button:hover, .discord-button:focus-visible { border-color: var(--c-yellow); color: var(--c-black); }
+.discord-button:hover::before, .discord-button:focus-visible::before { transform: translateX(0); }
+.discord-button:hover .discord-button__circle, .discord-button:focus-visible .discord-button__circle { background: var(--c-black); color: var(--c-yellow); }
+
+/* =====================================================================
+   FAQ (75:1333)
+   ===================================================================== */
+.faq {
+  position: relative;
+  min-height: max(100vh, calc(999 * var(--u)));
+  padding: calc(184 * var(--u)) calc(43 * var(--u)) calc(160 * var(--u)) var(--margin);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: var(--c-black);
+}
+.faq__left { width: calc(533 * var(--u)); display: flex; flex-direction: column; gap: calc(16 * var(--u)); }
+.faq__eyebrow { font-size: var(--fs-16); line-height: 1.4; text-transform: uppercase; white-space: nowrap; }
+.faq__title { font-family: var(--font-display); font-weight: 400; font-size: calc(96 * var(--u)); line-height: 1.4; text-transform: uppercase; }
+.faq__list { width: calc(1065 * var(--u)); border-top: 1px solid rgba(255, 255, 255, 0.2); }
+/* FAQ rows (74:540): question text 35 below the divider (closed row 110: 35 + 40 + 35);
+   open: answer 18 px, 16 below the question, 40 above the next divider. The number (top 44)
+   and the Icon (top 24) stay at the top when a question wraps onto two lines. */
+.faq-row { padding-bottom: calc(35 * var(--u)); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+.faq-row__h { font: inherit; }
+.faq-row__q {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: calc(77 * var(--u));
+  padding: calc(24 * var(--u)) 0 0;
+  text-align: left;
+}
+.faq-row__num { flex: none; width: calc(20 * var(--u)); min-width: 18px; margin-top: calc(20 * var(--u)); font-size: var(--fs-16); line-height: 1.4; color: rgba(255, 255, 255, 0.62); }
+.faq-row__text { flex: none; width: calc(824 * var(--u)); margin-top: calc(11 * var(--u)); font-weight: 500; font-size: calc(40 * var(--u)); line-height: 1; color: var(--c-white); }
+.faq-row__icon {
+  position: relative;
+  flex: none;
+  display: grid; place-items: center;
+  width: calc(62 * var(--u)); height: calc(62 * var(--u)); min-width: 40px; min-height: 40px;
+  margin-left: auto;
+  margin-bottom: calc(-11 * var(--u));   /* the row's height follows the question text, not the Icon */
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  transition: background-color 250ms ease, border-color 250ms ease;
+}
+.faq-row__icon svg { grid-area: 1 / 1; width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 16px; min-height: 16px; transition: opacity 260ms ease, transform 420ms var(--ease-out); }
+.faq-row__minus { opacity: 0; transform: rotate(-90deg); }
+.faq-row__q:hover .faq-row__icon { border-color: rgba(255, 255, 255, 0.6); }
+.faq-row.is-open .faq-row__plus { opacity: 0; transform: rotate(90deg); }
+.faq-row.is-open .faq-row__minus { opacity: 1; transform: none; }
+.faq-row__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 480ms var(--ease-out);
+}
+.faq-row.is-open .faq-row__panel { grid-template-rows: 1fr; }
+.faq-row__panel-inner { overflow: hidden; min-height: 0; }
+.faq-row__answer {
+  padding: calc(16 * var(--u)) calc(100 * var(--u)) calc(5 * var(--u)) calc(97 * var(--u));   /* right 100 (scales with the window); + the row's 35 = 40 below */
+  font-size: max(13px, calc(18 * var(--u)));
+  line-height: 1;
+  color: var(--c-white);
+  opacity: 0;
+  transform: translateY(calc(-8 * var(--u)));
+  transition: opacity 300ms ease, transform 420ms var(--ease-out);
+}
+.faq-row.is-open .faq-row__answer { opacity: 1; transform: none; transition-delay: 80ms; }
+.faq-row__answer a { text-decoration: underline; text-decoration-skip-ink: none; text-underline-position: from-font; }
+.faq-row__answer a:hover { color: var(--c-yellow); }
+
+/* =====================================================================
+   FOOTER (75:1424)
+   ===================================================================== */
+.footer {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: calc(1080 * var(--u));
+  overflow: hidden;
+  background: var(--c-yellow);
+  color: var(--c-black);
+}
+.footer__logo { position: absolute; left: var(--margin); top: calc(40 * var(--u)); width: calc(100.5 * var(--u)); aspect-ratio: 1; }
+.footer__logo img { width: 100%; height: 100%; object-fit: cover; }
+.footer__socials { position: absolute; right: var(--margin); top: calc(40 * var(--u)); display: flex; gap: calc(12 * var(--u)); }
+.footer-social {
+  display: grid; place-items: center;
+  width: calc(62 * var(--u)); height: calc(62 * var(--u)); min-width: 40px; min-height: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.26);
+  border-radius: 50%;
+  color: var(--c-black);
+  transition: background-color 250ms ease, color 250ms ease;
+}
+.footer-social svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); min-width: 18px; min-height: 18px; }
+.footer-social .mask-icon--discord { width: calc(24.5 * var(--u)); height: calc(24.5 * var(--u)); min-width: 16px; min-height: 16px; }
+.footer-social .mask-icon--x { width: calc(21.875 * var(--u)); height: calc(19.82 * var(--u)); min-width: 14px; min-height: 13px; }
+.footer-social:hover { background: transparent; }
+.footer__invite {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (356 - 540) * var(--u));
+  transform: translateX(-50%);
+  width: max(240px, calc(318 * var(--u)));
+  font-size: var(--fs-16);
+  line-height: 1.4;
+  text-align: center;
+  text-transform: uppercase;
+}
+.footer-button {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + (434 - 540) * var(--u));
+  transform: translateX(-50%);
+  width: calc(1168 * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(37 * var(--u));
+  padding: calc(32 * var(--u)) 0 calc(32 * var(--u)) calc(52 * var(--u));
+  border: 2px solid rgba(0, 0, 0, 0.26);
+  border-radius: calc(213 * var(--u));
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+/* FooterButtonHover (91:411): dark pill, lime text, lime circle with a dark arrow */
+.footer-button::before { background: var(--c-black); }
+.footer-button:hover, .footer-button:focus-visible { border-color: var(--c-black); }
+.footer-button:hover::before, .footer-button:focus-visible::before { transform: translateX(0); }
+.footer-button__title { flex: none; width: calc(880 * var(--u)); font-family: var(--font-display); font-size: calc(96 * var(--u)); line-height: 1.4; text-transform: uppercase; color: var(--c-black); transition: color var(--hover-ms, 700ms) var(--ease-in-out); }
+.footer-button:hover .footer-button__title, .footer-button:focus-visible .footer-button__title { color: var(--c-yellow); }
+.footer-button__circle {
+  flex: none;
+  display: grid; place-items: center;
+  width: calc(160 * var(--u)); height: calc(160 * var(--u));
+  border-radius: 50%;
+  background: var(--c-black);
+  color: var(--c-yellow);
+  transition: background-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.footer-button__circle svg { width: calc(75 * var(--u)); height: calc(75 * var(--u)); }
+.footer-button:hover .footer-button__circle, .footer-button:focus-visible .footer-button__circle { background: var(--c-yellow); color: var(--c-icon-dark); }
+.footer__copy, .footer__cookies, .footer__top {
+  position: absolute;
+  bottom: calc(44 * var(--u));
+  font-size: var(--fs-16);
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.footer__copy { left: calc(48 * var(--u)); }
+.footer__cookies { left: calc(238 * var(--u)); }   /* new Footer: next to the copyright */
+.footer__top { right: calc(32 * var(--u)); display: flex; align-items: center; gap: calc(12 * var(--u)); cursor: pointer; }
+.footer__top svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); min-width: 14px; min-height: 14px; color: var(--c-icon-dark); transition: transform 300ms var(--ease-out); }
+.footer__top:hover svg { transform: translateY(-3px); }
+
+/* =====================================================================
+   GAME BUTTONS (Buttons 95:577): BuyNow · WatchTrailer · SecButton
+   ===================================================================== */
+.cta {
+  display: flex;
+  align-items: center;
+  gap: calc(24 * var(--u));
+  height: calc(64 * var(--u));
+  min-height: 44px;
+  padding: 0 calc(4 * var(--u)) 0 calc(32 * var(--u));
+  border-radius: calc(49 * var(--u));
+  color: var(--c-black);
+  font-weight: 500;
+  font-size: var(--fs-16);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.cta--buy { background: var(--c-yellow); }
+.cta--trailer { background: var(--c-white); }
+.cta__icon {
+  display: grid; place-items: center;
+  width: calc(52 * var(--u)); height: calc(52 * var(--u)); min-width: 36px; min-height: 36px;
+  border-radius: 50%;
+  background: var(--c-black);
+  transition: transform 300ms var(--ease-out);
+}
+.cta--buy .cta__icon { color: var(--c-yellow); }
+.cta--buy .cta__icon svg { width: 38.5%; height: 38.5%; }        /* 20 / 52 */
+.cta--trailer .cta__icon { color: var(--c-white); }
+.cta--trailer .cta__icon svg { width: 46%; height: 46%; }        /* 24 / 52 */
+.cta:hover .cta__icon { transform: scale(1.06); }
+.game-buttons .sec-button { border-color: rgba(255, 255, 255, 0.46); color: var(--c-white); }
+.game-buttons .sec-button:hover { background: var(--c-white); border-color: var(--c-white); color: var(--c-black); }
+
+/* =====================================================================
+   GAME MODALS — same blur + panel entrance as the "Our games" Modal
+   ===================================================================== */
+.game-modal { position: fixed; inset: 0; z-index: 110; }
+.game-modal[hidden] { display: none; }
+.game-modal__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(14, 15, 14, 0);
+  -webkit-backdrop-filter: blur(0px);
+          backdrop-filter: blur(0px);
+  transition: background-color var(--nav-blur-ms, 380ms) ease, -webkit-backdrop-filter var(--nav-blur-ms, 380ms) ease, backdrop-filter var(--nav-blur-ms, 380ms) ease;
+}
+.game-modal.is-blurred .game-modal__backdrop {
+  background: rgba(14, 15, 14, 0.35);
+  -webkit-backdrop-filter: blur(14px);
+          backdrop-filter: blur(14px);
+}
+.game-modal__panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, calc(-50% + 24 * var(--u))) scale(0.97);
+  opacity: 0;
+  background: var(--c-black);
+  border: 1px solid rgba(255, 255, 255, 0.2);   /* #FFFFFF at 20 % */
+  border-radius: calc(32 * var(--u));
+  transition: opacity 320ms ease, transform 480ms var(--ease-out);
+}
+.game-modal.is-panel .game-modal__panel { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.buy-modal__content, .video-modal__frame {
+  opacity: 0;
+  transform: translateY(calc(20 * var(--u)));
+  transition: opacity 360ms ease, transform 520ms var(--ease-out);
+}
+.game-modal.is-content .buy-modal__content { opacity: 1; transform: none; }
+.game-modal.is-content .video-modal__frame { opacity: 1; transform: translate(-50%, -50%); }
+
+.modal-close {
+  position: absolute;
+  top: calc(20 * var(--u));
+  right: calc(20 * var(--u));
+  display: grid; place-items: center;
+  width: calc(48 * var(--u)); height: calc(48 * var(--u)); min-width: 36px; min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: var(--c-white);
+  transition: background-color 250ms ease, border-color 250ms ease;
+}
+.modal-close svg { width: 50%; height: 50%; }
+.modal-close:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.6); }
+
+/* BuyNow modal (837 × 445) */
+.buy-modal { width: calc(1014 * var(--u)); padding: calc(56 * var(--u)); }   /* 108:1441 — 1014 × 549 */
+.buy-modal__content { width: calc(902 * var(--u)); min-height: calc(437 * var(--u)); display: flex; flex-direction: column; gap: calc(32 * var(--u)); }
+.buy-modal__head { display: flex; align-items: flex-start; gap: calc(32 * var(--u)); }
+.buy-modal__cover { flex: none; width: calc(300 * var(--u)); height: calc(300 * var(--u)); border-radius: calc(12 * var(--u)); overflow: hidden; }
+.buy-modal__cover img { width: 100%; height: 100%; object-fit: cover; }
+.game-modal[data-game="1"] .buy-modal__cover { border: 1px solid rgba(255, 255, 255, 0.18); }
+.buy-modal__heading { width: calc(516 * var(--u)); display: flex; flex-direction: column; gap: calc(16 * var(--u)); }
+.buy-modal__eyebrow { font-weight: 500; font-size: var(--fs-13); line-height: 1; text-transform: uppercase; color: rgba(255, 255, 255, 0.61); }
+.buy-modal__title { font-family: var(--font-display); font-weight: 400; font-size: calc(48 * var(--u)); line-height: 1.4; text-transform: uppercase; color: var(--c-white); }
+.buy-modal__platforms { display: flex; flex-direction: column; gap: calc(16 * var(--u)); }
+.buy-modal__stores { display: flex; gap: calc(12 * var(--u)); }
+.store-pill {
+  flex: 1 0 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: calc(10 * var(--u));
+  height: calc(68 * var(--u)); min-height: 44px;
+  padding: 0 calc(10 * var(--u));
+  border-radius: calc(46 * var(--u));
+  background: var(--c-white);
+  color: var(--c-black);
+  font-weight: 500;
+  font-size: max(14px, calc(20 * var(--u)));
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color 250ms ease;
+}
+.store-pill svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); min-width: 20px; min-height: 20px; }
+.store-pill:hover { background: var(--c-yellow); }
+
+/* WatchTrailer modal (ModalVideo 1474 × 829, iframe 1280 × 720) — scales with the window */
+.video-modal {
+  width: min(calc(1474 * var(--u)), calc(100vw - 48px), calc((100vh - 48px) * 1474 / 829));
+  aspect-ratio: 1474 / 829;
+  overflow: hidden;
+}
+.video-modal__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 86.84%;                       /* 1280 / 1474 */
+  aspect-ratio: 16 / 9;
+  transform: translate(-50%, calc(-50% + 20 * var(--u)));
+  background: #000;
+}
+.video-modal__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* =====================================================================
+   Reduced motion
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 1ms !important; transition-delay: 0ms !important; animation: none !important; }
+  .cursor-trail { display: none; }
+}
+
+/* =====================================================================
+   HOVER FILLS — BuyNow, WatchTrailer, SecButton, store buttons in the BuyNow
+   modals, CloseModal, FAQ Icon. Same pattern as Discord / Footer / TopButton:
+   a pill with the element's own corner radius slides in from the left
+   (translate, so its rounded leading edge keeps its shape), ease-in-out.
+   ===================================================================== */
+.cta, .sec-button, .store-pill, .faq-row__icon { position: relative; }
+.cta, .sec-button, .store-pill, .modal-close, .faq-row__icon {   /* .modal-close stays position: absolute (top-right corner) */
+  overflow: hidden;
+  isolation: isolate;
+}
+.cta::before, .sec-button::before, .store-pill::before, .modal-close::before, .faq-row__icon::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--fill, #fff);
+  transform: translateX(-101%);
+  transition: transform var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.cta:hover::before, .cta:focus-visible::before,
+.sec-button:hover::before, .sec-button:focus-visible::before,
+.store-pill:hover::before, .store-pill:focus-visible::before,
+.modal-close:hover::before, .modal-close:focus-visible::before,
+.faq-row__q:hover .faq-row__icon::before, .faq-row__q:focus-visible .faq-row__icon::before { transform: translateX(0); }
+
+/* BuyNow: #D0DE3B fill, the bag icon turns #D0DE3B too */
+.cta--buy { --fill: #d0de3b; }
+/* WatchTrailer: #D2D2D2 fill, the YouTube icon turns #D2D2D2 too */
+.cta--trailer { --fill: #d2d2d2; }
+.cta .cta__icon { transition: transform 300ms var(--ease-out), color var(--hover-ms, 700ms) var(--ease-in-out); }
+.cta:hover .cta__icon { transform: none; }
+.cta--buy:hover .cta__icon, .cta--buy:focus-visible .cta__icon { color: #d0de3b; }
+.cta--trailer:hover .cta__icon, .cta--trailer:focus-visible .cta__icon { color: #d2d2d2; }
+
+/* SecButton: outline + inside fill white, text #0E0F0E */
+.sec-button { --fill: var(--c-white); transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out); }
+.sec-button:hover, .game-buttons .sec-button:hover,
+.sec-button:focus-visible, .game-buttons .sec-button:focus-visible { background: transparent; border-color: var(--c-white); color: var(--c-black); }
+
+/* store buttons inside the BuyNow modals: #D2D2D2 fill */
+.store-pill { --fill: #d2d2d2; transition: none; }
+.store-pill:hover { background: var(--c-white); }
+
+/* CloseModal: outline + inside fill white, icon #0E0F0E */
+.modal-close { --fill: var(--c-white); transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out); }
+.modal-close:hover, .modal-close:focus-visible { background: transparent; border-color: var(--c-white); color: var(--c-black); }
+
+/* FAQ Icon: outline + inside fill white, icon #0E0F0E */
+.faq-row__icon { --fill: var(--c-white); color: var(--c-white); transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out); }
+.faq-row__q:hover .faq-row__icon, .faq-row__q:focus-visible .faq-row__icon { border-color: var(--c-white); color: var(--c-black); }
+
+/* Footer Socials: dark fill slides in left → right as a circle (the button's own radius), ease-in-out;
+   the icon turns lime */
+.footer-social { position: relative; overflow: hidden; isolation: isolate; transition: border-color var(--hover-ms, 700ms) var(--ease-in-out), color var(--hover-ms, 700ms) var(--ease-in-out); }
+.footer-social .mask-icon { transition: background-color var(--hover-ms, 700ms) var(--ease-in-out); }
+.footer-social::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--c-black);
+  transform: translateX(-101%);
+  transition: transform var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.footer-social:hover::before, .footer-social:focus-visible::before { transform: translateX(0); }
+.footer-social:hover, .footer-social:focus-visible { border-color: var(--c-black); color: var(--c-yellow); }
+
+/* Buttons (BuyNow · WatchTrailer · SecButton): trim the label's line box to the capital letters,
+   so flex centring puts the caps exactly in the middle (the font's ascender/descender space is uneven) */
+.cta > span:first-child, .sec-button > span { text-box: trim-both cap alphabetic; }
+
+/* DiscordSection sliding over TheBookwalkerSection: the block underneath moves back, scrubbed
+   with the scroll (games.js sets --cv-*) */
+.games.is-covering .game-block.is-current {
+  transition: none;
+  transform: scale(var(--cv-scale, 1));
+  filter: brightness(var(--cv-dark, 1));
+  clip-path: inset(0 round var(--cv-radius, 0px));
+}
+/* GamesShowcase: once the circle has covered the screen, the running GAMES line and GamesLabel are
+   hidden — only the lime background is left behind the blocks as they scale back */
+.games.is-revealed .games-intro, .games.is-covering .games-intro { visibility: hidden; }

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- YouTube embeds need the page origin as referrer (otherwise "Error 153") -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>DO MY BEST — Indie Game Studio</title>
+  <meta name="description" content="Do My Best is an indie game studio creating unique gaming experiences through bold ideas, creative experimentation, and a passion for play.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Space+Grotesk:wght@400;500&family=Syne:wght@400&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"/></symbol>
+      <symbol id="i-arrow-ru" viewBox="0 0 24 24"><path d="M16.004 9.414L7.397 18.021L5.983 16.607L14.589 8H7.004V6H18.004V17H16.004V9.414V9.414Z"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M12 10.586L16.95 5.636L18.364 7.05L13.414 12L18.364 16.95L16.95 18.364L12 13.414L7.05 18.364L5.636 16.95L10.586 12L5.636 7.05L7.05 5.636L12 10.586Z"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 32 32"><path d="M6.66667 14.6667H25.3333V17.3333H6.66667V14.6667Z"/></symbol>
+      <symbol id="i-send" viewBox="0 0 20 20"><path d="M1.62194 7.7625C1.18694 7.6175 1.18277 7.38333 1.63027 7.23417L17.5361 1.9325C17.9769 1.78583 18.2294 2.0325 18.1061 2.46417L13.5611 18.3692C13.4361 18.81 13.1819 18.825 12.9953 18.4067L10.0003 11.6667L15.0003 5L8.33361 10L1.62194 7.7625V7.7625Z"/></symbol>
+      <symbol id="i-arrow-up" viewBox="0 0 20 20"><path d="M10.8333 6.52333V16.6667H9.16667V6.52333L4.69667 10.9933L3.51833 9.815L10 3.33333L16.4817 9.815L15.3033 10.9933L10.8333 6.52333Z"/></symbol>
+      <symbol id="i-steam" viewBox="0 0 28 28"><path d="M14.0047 2.33333C7.87967 2.33333 2.856 7.05833 2.38 13.0632L8.63333 15.6485C9.163 15.2868 9.80233 15.0745 10.4918 15.0745C10.5537 15.0745 10.6132 15.078 10.675 15.0803L13.4563 11.053V10.9958C13.4563 8.56917 15.428 6.5975 17.8547 6.5975C20.2802 6.5975 22.253 8.5715 22.253 10.9982C22.253 13.4248 20.279 15.3977 17.8547 15.3977H17.7532L13.79 18.228C13.79 18.2782 13.7935 18.3307 13.7935 18.3832C13.7935 20.2055 12.3212 21.6848 10.4977 21.6848C8.90867 21.6848 7.56583 20.5438 7.26017 19.033L2.7825 17.1792C4.1685 22.0757 8.66483 25.6667 14.0058 25.6667C20.4482 25.6667 25.6702 20.4435 25.6702 14C25.6702 7.55767 20.447 2.33333 14.0047 2.33333ZM8.25767 19.4448C8.512 19.9722 8.95183 20.4155 9.534 20.6593C10.7952 21.1843 12.25 20.5858 12.7738 19.3235C13.0305 18.711 13.0305 18.0402 12.7785 17.4277C12.5277 16.8152 12.0493 16.338 11.4403 16.0837C10.8337 15.8305 10.1862 15.841 9.6145 16.0545L11.095 16.667C12.0248 17.0555 12.4647 18.1253 12.075 19.054C11.69 19.9838 10.6202 20.4248 9.69033 20.0375L8.25767 19.4448V19.4448ZM20.7877 10.9923C20.7877 9.3765 19.4717 8.06167 17.8558 8.06167C16.2377 8.06167 14.9252 9.3765 14.9252 10.9923C14.9252 12.6117 16.2377 13.9242 17.8558 13.9242C19.4728 13.9242 20.7865 12.6117 20.7865 10.9923H20.7877ZM17.8617 8.785C19.075 8.785 20.0643 9.77083 20.0643 10.9877C20.0643 12.2045 19.0762 13.1903 17.8617 13.1903C16.6437 13.1903 15.659 12.2045 15.659 10.9877C15.659 9.77083 16.6448 8.785 17.8617 8.785V8.785Z"/></symbol>
+      <symbol id="i-ps" viewBox="0 0 24 24"><path d="M22.584 17.011C22.154 17.554 21.102 17.941 21.102 17.941L13.269 20.758V18.68L19.033 16.623C19.688 16.389 19.788 16.057 19.256 15.883C18.726 15.708 17.765 15.758 17.11 15.994L13.27 17.348V15.193L13.49 15.118C13.49 15.118 14.6 14.724 16.161 14.551C17.721 14.379 19.633 14.575 21.133 15.144C22.823 15.679 23.013 16.467 22.584 17.01V17.011ZM14.014 13.474V8.162C14.014 7.538 13.9 6.964 13.315 6.802C12.868 6.658 12.59 7.074 12.59 7.697V21L9.006 19.861V4C10.53 4.283 12.75 4.953 13.943 5.355C16.978 6.398 18.007 7.697 18.007 10.622C18.007 13.473 16.249 14.554 14.015 13.474H14.014ZM2.431 18.464C0.696 17.974 0.407 16.954 1.198 16.367C1.929 15.825 3.172 15.417 3.172 15.417L8.31 13.587V15.673L4.613 16.998C3.96 17.232 3.859 17.564 4.39 17.738C4.921 17.913 5.883 17.863 6.537 17.628L8.31 16.984V18.849L7.957 18.909C6.183 19.199 4.293 19.078 2.431 18.464V18.464Z"/></symbol>
+      <symbol id="i-xbox" viewBox="0 0 24 24"><path d="M5.418 19.527C7.23821 21.1244 9.57825 22.0036 12 22C14.4226 22.0033 16.7635 21.1242 18.585 19.527C20.149 17.934 14.988 12.27 12 10.013C9.015 12.27 3.85 17.934 5.418 19.527ZM14.718 7.522C16.802 9.99 20.955 16.117 19.782 18.282C21.2204 16.5058 22.0036 14.2886 22 12.003C22.0018 10.6791 21.7397 9.36822 21.2288 8.14689C20.718 6.92556 19.9688 5.81834 19.025 4.89C19.025 4.89 19.003 4.872 18.957 4.855C18.8815 4.82873 18.8019 4.81587 18.722 4.817C18.229 4.817 17.068 5.179 14.718 7.522V7.522ZM5.045 4.856C4.997 4.873 4.977 4.89 4.973 4.891C4.0299 5.81956 3.28127 6.92672 2.77082 8.14783C2.26037 9.36893 1.99833 10.6795 2 12.003C2 14.382 2.832 16.564 4.218 18.281C3.05 16.11 7.2 9.988 9.284 7.523C6.934 5.178 5.771 4.818 5.28 4.818C5.20019 4.8154 5.12065 4.82866 5.046 4.857V4.855L5.045 4.856ZM12 4.959C12 4.959 9.546 3.523 7.63 3.455C6.877 3.428 6.418 3.701 6.362 3.737C8.149 2.538 10.049 2 11.987 2H12C13.945 2 15.838 2.538 17.638 3.737C17.582 3.699 17.126 3.427 16.372 3.455C14.455 3.523 12 4.955 12 4.955V4.959Z"/></symbol>
+      <symbol id="i-steam-store" viewBox="0 0 24 24"><path d="M12.004 2C6.754 2 2.448 6.05 2.04 11.197L7.4 13.413C7.854 13.103 8.402 12.921 8.993 12.921C9.046 12.921 9.097 12.924 9.15 12.926L11.534 9.474V9.425C11.534 7.345 13.224 5.655 15.304 5.655C17.383 5.655 19.074 7.347 19.074 9.427C19.074 11.507 17.382 13.198 15.304 13.198H15.217L11.82 15.624C11.82 15.667 11.823 15.712 11.823 15.757C11.823 17.319 10.561 18.587 8.998 18.587C7.636 18.587 6.485 17.609 6.223 16.314L2.385 14.725C3.573 18.922 7.427 22 12.005 22C17.527 22 22.003 17.523 22.003 12C22.003 6.478 17.526 2 12.004 2ZM7.078 16.667C7.296 17.119 7.673 17.499 8.172 17.708C9.253 18.158 10.5 17.645 10.949 16.563C11.169 16.038 11.169 15.463 10.953 14.938C10.738 14.413 10.328 14.004 9.806 13.786C9.286 13.569 8.731 13.578 8.241 13.761L9.51 14.286C10.307 14.619 10.684 15.536 10.35 16.332C10.02 17.129 9.103 17.507 8.306 17.175L7.078 16.667V16.667ZM17.818 9.422C17.818 8.037 16.69 6.91 15.305 6.91C13.918 6.91 12.793 8.037 12.793 9.422C12.793 10.81 13.918 11.935 15.305 11.935C16.691 11.935 17.817 10.81 17.817 9.422H17.818ZM15.31 7.53C16.35 7.53 17.198 8.375 17.198 9.418C17.198 10.461 16.351 11.306 15.31 11.306C14.266 11.306 13.422 10.461 13.422 9.418C13.422 8.375 14.267 7.53 15.31 7.53V7.53Z"/></symbol>
+      <symbol id="i-plus-faq" viewBox="0 0 36 36"><path d="M16.5 16.5V7.5H19.5V16.5H28.5V19.5H19.5V28.5H16.5V19.5H7.5V16.5H16.5Z"/></symbol>
+      <symbol id="i-arrow-ru-lg" viewBox="0 0 75 75"><path d="M55.7623 19.25V52.625H50.5123V29.4189H50.0123L49.6588 29.0654L23.1158 55.6084L19.4029 51.8955L45.9439 25.3535L46.7975 24.5H22.3873V19.25H55.7623Z"/></symbol>
+      <symbol id="i-bag" viewBox="0 0 20 20"><path d="M5.41667 1.66667H14.5833C14.7127 1.66667 14.8403 1.69679 14.956 1.75464C15.0717 1.8125 15.1724 1.8965 15.25 2L17.5 5V17.5C17.5 17.721 17.4122 17.933 17.2559 18.0893C17.0996 18.2455 16.8877 18.3333 16.6667 18.3333H3.33333C3.11232 18.3333 2.90036 18.2455 2.74408 18.0893C2.5878 17.933 2.5 17.721 2.5 17.5V5L4.75 2C4.82762 1.8965 4.92828 1.8125 5.04399 1.75464C5.1597 1.69679 5.2873 1.66667 5.41667 1.66667ZM15.4167 5L14.1667 3.33333H5.83333L4.58333 5H15.4167ZM7.5 8.33333H5.83333V10C5.83333 11.1051 6.27232 12.1649 7.05372 12.9463C7.83512 13.7277 8.89493 14.1667 10 14.1667C11.1051 14.1667 12.1649 13.7277 12.9463 12.9463C13.7277 12.1649 14.1667 11.1051 14.1667 10V8.33333H12.5V10C12.5 10.663 12.2366 11.2989 11.7678 11.7678C11.2989 12.2366 10.663 12.5 10 12.5C9.33696 12.5 8.70107 12.2366 8.23223 11.7678C7.76339 11.2989 7.5 10.663 7.5 10V8.33333Z"/></symbol>
+      <symbol id="i-youtube" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M21.543 6.498C22 8.28 22 12 22 12C22 12 22 15.72 21.543 17.502C21.289 18.487 20.546 19.262 19.605 19.524C17.896 20 12 20 12 20C12 20 6.107 20 4.395 19.524C3.45 19.258 2.708 18.484 2.457 17.502C2 15.72 2 12 2 12C2 12 2 8.28 2.457 6.498C2.711 5.513 3.454 4.738 4.395 4.476C6.107 4 12 4 12 4C12 4 17.896 4 19.605 4.476C20.55 4.742 21.292 5.516 21.543 6.498ZM10 15.5L16 12L10 8.5V15.5Z"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="skip-link" href="#about">Skip to content</a>
+
+  <!-- ============ Fixed chrome: TopBar (48:1496 / TopBarBright 75:748) ============ -->
+  <header class="topbar" data-theme="bright" data-name="TopBar">
+    <a class="topbar__logo" href="#top" data-scroll-to="top" aria-label="Do My Best — back to top">
+      <img class="topbar__logo-img topbar__logo-img--dark" src="assets/logo-dark.png" alt="" width="100" height="100">
+      <img class="topbar__logo-img topbar__logo-img--yellow" src="assets/logo-yellow.png" alt="" width="100" height="100">
+    </a>
+    <div class="topbar__actions" data-name="HeaderActions">
+      <nav class="social-icons" aria-label="Social links" data-name="SocialIcons">
+        <a class="social-icon" data-link="steam" target="_blank" rel="noopener" aria-label="Steam">
+          <svg class="social-icon__svg" viewBox="0 0 28 28" aria-hidden="true"><use href="#i-steam"/></svg>
+        </a>
+        <a class="social-icon" data-link="discord" target="_blank" rel="noopener" aria-label="Discord">
+          <span class="mask-icon mask-icon--discord" aria-hidden="true"></span>
+        </a>
+        <a class="social-icon" data-link="x" target="_blank" rel="noopener" aria-label="X">
+          <span class="mask-icon mask-icon--x" aria-hidden="true"></span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============ Fixed chrome: NavigationNew (116:1915) ============ -->
+  <nav class="navigation" data-theme="dark" aria-label="Main" data-name="NavigationNew">
+    <a class="navigation__item" href="#about" data-scroll-to="about" data-name="AboutNav"><span>About</span><span class="navigation__fill" aria-hidden="true"><span>About</span></span></a>
+    <a class="navigation__item" href="#games" data-goto-game="1" data-name="GamesNav"><span>Our games</span><span class="navigation__fill" aria-hidden="true"><span>Our games</span></span></a>
+    <a class="navigation__item" href="#contact" data-scroll-to="contact" data-name="ContactNav"><span>Contact</span><span class="navigation__fill" aria-hidden="true"><span>Contact</span></span></a>
+  </nav>
+
+  <!-- ============ Game modals: BuyNow (105:1283 / 105:1242 / 105:1204) and WatchTrailer (ModalVideo 107:1359) ============ -->
+  <div class="game-modal game-modal--buy" id="buy-modal" role="dialog" aria-modal="true" aria-labelledby="buy-modal-title" hidden>
+    <div class="game-modal__backdrop" data-close></div>
+    <div class="game-modal__panel buy-modal" data-name="BuyNowModal">
+      <div class="buy-modal__content">
+        <div class="buy-modal__head">
+          <div class="buy-modal__cover"><img alt="" width="200" height="200"></div>
+          <div class="buy-modal__heading">
+            <p class="buy-modal__eyebrow">Buy now</p>
+            <h2 class="buy-modal__title" id="buy-modal-title"></h2>
+          </div>
+        </div>
+        <div class="buy-modal__platforms">
+          <p class="buy-modal__eyebrow">Choose your platform:</p>
+          <div class="buy-modal__stores" data-name="StoreLinks">
+            <a class="store-pill" data-store="steam" target="_blank" rel="noopener" data-name="SteamStoreButton"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-steam-store"/></svg>Steam</a>
+            <a class="store-pill" data-store="playstation" target="_blank" rel="noopener" data-name="PlayStationStoreButton"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-ps"/></svg>PS4 Store</a>
+            <a class="store-pill" data-store="xbox" target="_blank" rel="noopener" data-name="XboxStoreButton"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-xbox"/></svg>Xbox One</a>
+          </div>
+        </div>
+      </div>
+      <button class="modal-close" type="button" data-close aria-label="Close" data-name="CloseModal"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+
+  <div class="game-modal game-modal--video" id="trailer-modal" role="dialog" aria-modal="true" aria-label="Trailer" hidden>
+    <div class="game-modal__backdrop" data-close></div>
+    <div class="game-modal__panel video-modal" data-name="ModalVideo">
+      <div class="video-modal__frame"></div>
+      <button class="modal-close" type="button" data-close aria-label="Close" data-name="CloseModal"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+
+
+  <main class="page" id="page">
+
+    <!-- ============ FirstScreen1 (HeroWorldBuilders 30:515) → FirstScreen2 (HeroWorldDestroyers 30:573) ============ -->
+    <section class="hero" id="top" aria-label="Small Team. Big Worlds.">
+      <!-- FirstScreen2: underneath -->
+      <div class="hero__scene hero__scene--f2" data-name="HeroWorldDestroyers">
+        <img class="hero__bg" src="assets/hero-world-destroyers.jpg" alt="">
+        <!-- background video (shown only while it plays; the image above is its poster) -->
+        <div class="hero-video bg-video" data-name="HeroBackgroundVideo"><div id="hero-video-player"></div></div>
+        <div class="hero__shade" aria-hidden="true"></div>
+        <p class="studio-label studio-label--f2">INDIE GAME STUDIO</p>
+        <div class="title-mask title-mask--1"><span class="title-text title-text--f2">Big</span></div>
+        <div class="title-mask title-mask--2"><span class="title-text title-text--f2">Worlds.</span></div>
+        <div class="playing-now" data-name="PlayingSection">
+          <p class="playing-now__label">Playing now</p>
+          <a class="playing-now__title" href="#games" data-goto-game="3"><span class="playing-now__text">The Bookwalker: Thief of Tales</span><span class="playing-now__line" aria-hidden="true"></span></a>
+        </div>
+        <p class="hero-scroll hero-scroll--f2" aria-hidden="true">ScroLl</p>
+      </div>
+      <!-- FirstScreen1: on top (burned away by Liquid Flow) -->
+      <div class="hero__scene hero__scene--f1" data-name="HeroWorldBuilders">
+        <p class="studio-label studio-label--f1">INDIE GAME STUDIO</p>
+        <div class="title-mask title-mask--1"><span class="title-text title-text--f1">Small</span></div>
+        <div class="title-mask title-mask--2"><span class="title-text title-text--f1">Team.</span></div>
+        <p class="hero-scroll hero-scroll--f1" aria-hidden="true">ScroLl</p>
+      </div>
+      <canvas class="burn-canvas" aria-hidden="true"></canvas>
+    </section>
+
+    <!-- ============ AboutSection (73:2507) — pinned, line-by-line highlight ============ -->
+    <section class="about" id="about" aria-labelledby="about-label">
+      <div class="about__stage">
+        <div class="reading-progress" data-name="ReadingProgressBar" role="progressbar" aria-label="About text read" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+          <span class="reading-progress__fill"></span>
+        </div>
+        <div class="about__content" data-name="About">
+          <h2 class="about__label" id="about-label" data-name="AboutLabel">About<br>Do my best</h2>
+          <p class="about__text" data-name="AboutText">Do My Best is an indie game studio creating unique gaming experiences through bold ideas, creative experimentation, and a passion for play.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GamesSection (73:2509) + GameSection1–3 (46:441, 73:2701, 73:2773) — pinned ============ -->
+    <section class="games" id="games" aria-label="Released games">
+      <div class="games__stage">
+        <div class="games-intro" data-name="GamesTexts">
+          <p class="games-intro__label" data-name="GamesLabel">Released<br>games</p>
+          <p class="games-intro__title" aria-hidden="true" data-name="GamesTitle"><span class="games-intro__track"><span>GAMES GAMES GAMES </span><span>GAMES GAMES GAMES </span></span></p>
+        </div>
+
+        <!-- Each game state is ONE block (background image + shadow + content) that scales back as a whole.
+             GameSection1's background is GamesNewImage: a window onto it grows until it fills the screen. -->
+        <div class="game-block" data-game="1">
+        <div class="games-video" data-name="GamesNewImage">
+          <img class="games-video__poster" src="assets/game-bg-final-station.png" alt="">
+        </div>
+        <img class="games-shadow games-shadow--reveal" src="assets/game-shadow.svg" alt="" data-name="Shadow">
+
+        <article class="game-layer" data-game="1" aria-label="The Final Station" data-name="TheFinalStationSection">
+          <div class="game-layer__top" data-name="GameSectionAbout">
+            <h3 class="game-title">The final station</h3>
+            <ul class="game-tags" data-name="GameTags"><li>Survival horror</li><li>Post-Apocalyptic</li><li>Side-Scroller</li></ul>
+            <div class="game-buttons" data-name="Buttons">
+              <button class="cta cta--buy" type="button" data-buy="1" aria-haspopup="dialog" data-name="BuyNow">
+                <span>Buy now</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><use href="#i-bag"/></svg></span>
+              </button>
+              <button class="cta cta--trailer" type="button" data-trailer="1" aria-haspopup="dialog" data-name="WatchTrailer">
+                <span>Watch trailer</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-youtube"/></svg></span>
+              </button>
+              <a class="sec-button" data-name="SecButton"><span>Learn more</span></a>
+            </div>
+          </div>
+          <div class="available" data-name="AvailableSection">
+            <p class="available__label">Available on</p>
+            <div class="available__icons"><img src="assets/badge-ps4.png" alt="PS4" class="badge badge--ps4"><img src="assets/badge-xbox-one.png" alt="Xbox One" class="badge badge--xbox"><img src="assets/badge-pc.png" alt="PC" class="badge badge--pc"></div>
+          </div>
+        </article>
+        </div>
+
+        <div class="game-block" data-game="2">
+          <div class="game-bg" data-name="GameBackground">
+            <img class="game-bg__poster" src="assets/game-bg-only-traitor.png" alt="">
+          </div>
+          <img class="games-shadow" src="assets/game-shadow.svg" alt="" data-name="Shadow">
+        <article class="game-layer" data-game="2" aria-label="The Final Station DLC: The Only Traitor" data-name="TheOnlyTraitorSection">
+          <div class="game-layer__top" data-name="GameSectionAbout">
+            <h3 class="game-title">The final station DLC:<br>The Only Traitor</h3>
+            <ul class="game-tags" data-name="GameTags"><li>Survival horror</li><li>Post-Apocalyptic</li><li>Side-Scroller</li></ul>
+            <div class="game-buttons" data-name="Buttons">
+              <button class="cta cta--buy" type="button" data-buy="2" aria-haspopup="dialog" data-name="BuyNow">
+                <span>Buy now</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><use href="#i-bag"/></svg></span>
+              </button>
+              <button class="cta cta--trailer" type="button" data-trailer="2" aria-haspopup="dialog" data-name="WatchTrailer">
+                <span>Watch trailer</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-youtube"/></svg></span>
+              </button>
+              <a class="sec-button" data-name="SecButton"><span>Learn more</span></a>
+            </div>
+          </div>
+          <div class="available" data-name="AvailableSection">
+            <p class="available__label">Available on</p>
+            <div class="available__icons"><img src="assets/badge-ps4.png" alt="PS4" class="badge badge--ps4"><img src="assets/badge-xbox-one.png" alt="Xbox One" class="badge badge--xbox"><img src="assets/badge-pc.png" alt="PC" class="badge badge--pc"></div>
+          </div>
+        </article>
+        </div>
+
+        <div class="game-block" data-game="3">
+          <div class="game-bg" data-name="GameBackground">
+            <img class="game-bg__poster" src="assets/game-bg-bookwalker.jpg" alt="">
+          </div>
+          <img class="games-shadow" src="assets/game-shadow.svg" alt="" data-name="Shadow">
+        <article class="game-layer" data-game="3" aria-label="The Bookwalker: Thief of Tales" data-name="TheBookwalkerSection">
+          <div class="game-layer__top" data-name="GameSectionAbout">
+            <h3 class="game-title">The Bookwalker:<br>Thief of Tales</h3>
+            <ul class="game-tags" data-name="GameTags"><li>Survival horror</li><li>Post-Apocalyptic</li><li>Side-Scroller</li></ul>
+            <div class="game-buttons" data-name="Buttons">
+              <button class="cta cta--buy" type="button" data-buy="3" aria-haspopup="dialog" data-name="BuyNow">
+                <span>Buy now</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 20 20"><use href="#i-bag"/></svg></span>
+              </button>
+              <button class="cta cta--trailer" type="button" data-trailer="3" aria-haspopup="dialog" data-name="WatchTrailer">
+                <span>Watch trailer</span>
+                <span class="cta__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-youtube"/></svg></span>
+              </button>
+              <a class="sec-button" data-name="SecButton"><span>Learn more</span></a>
+            </div>
+          </div>
+          <div class="available" data-name="AvailableSection">
+            <p class="available__label">Available on</p>
+            <div class="available__icons"><img src="assets/badge-ps4.png" alt="PS4" class="badge badge--ps4"><img src="assets/badge-xbox-one.png" alt="Xbox One" class="badge badge--xbox"><img src="assets/badge-pc.png" alt="PC" class="badge badge--pc"></div>
+          </div>
+        </article>
+        </div>
+
+        <!-- Liquid Flow (the first-screen shader): the lime intro burns away around the growing circle -->
+
+        <div class="small-progress" data-name="SmallProgressBar" role="progressbar" aria-label="Game" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1">
+          <span class="small-progress__seg"><i></i></span><span class="small-progress__seg"><i></i></span><span class="small-progress__seg"><i></i></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DiscordSection (48:1025) ============ -->
+    <section class="discord" id="community" aria-labelledby="discord-label">
+      <img class="discord__character" src="assets/community-character.png" alt="" data-name="CommunityCharacter">
+      <div class="discord__fade" aria-hidden="true"></div>
+      <p class="discord__text" data-name="CommunityDescription">Join our community, connect with fellow gamers, share your thoughts, and stay up to date with our latest games and studio news.</p>
+      <p class="discord__label" id="discord-label" data-name="CommunityLabel">JOIN OUR Discord</p>
+      <a class="discord-button" data-link="discord" target="_blank" rel="noopener" data-name="DiscordButton">
+        <span class="mask-icon mask-icon--discord-lg discord-button__logo" aria-hidden="true"></span>
+        <span class="discord-button__title">Discord</span>
+        <span class="discord-button__circle" aria-hidden="true"><svg viewBox="0 0 75 75"><use href="#i-arrow-ru-lg"/></svg></span>
+      </a>
+    </section>
+
+    <!-- ============ FAQSection (75:1333) ============ -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="faq__left" data-name="FAQSectionLeft">
+        <p class="faq__eyebrow" data-name="FAQEyebrow">frequently asked questions and...</p>
+        <h2 class="faq__title" id="faq-title">Direct answers</h2>
+      </div>
+      <div class="faq__list" data-name="FAQSectionRight"><!-- rows rendered by faq.js from config.faq --></div>
+    </section>
+
+    <!-- ============ Footer (75:1424) ============ -->
+    <footer class="footer" id="contact" data-name="Footer">
+      <a class="footer__logo" href="#top" data-scroll-to="top" aria-label="Do My Best — back to top"><img src="assets/logo-dark.png" alt="" width="100" height="100"></a>
+      <div class="footer__socials" data-name="SocialLinks">
+        <a class="footer-social" data-link="steam" target="_blank" rel="noopener" aria-label="Steam"><svg viewBox="0 0 28 28" aria-hidden="true"><use href="#i-steam"/></svg></a>
+        <a class="footer-social" data-link="discord" target="_blank" rel="noopener" aria-label="Discord"><span class="mask-icon mask-icon--discord" aria-hidden="true"></span></a>
+        <a class="footer-social" data-link="x" target="_blank" rel="noopener" aria-label="X"><span class="mask-icon mask-icon--x" aria-hidden="true"></span></a>
+      </div>
+      <p class="footer__invite">Feel free to contact us if you have any questions or suggestions.</p>
+      <a class="footer-button" data-link="email" data-name="FooterButton">
+        <span class="footer-button__title">Get in touch</span>
+        <span class="footer-button__circle" aria-hidden="true"><svg viewBox="0 0 75 75"><use href="#i-arrow-ru-lg"/></svg></span>
+      </a>
+      <p class="footer__copy">DO MY BEST © 2026</p>
+      <p class="footer__cookies">This website is using cookies.</p>
+      <a class="footer__top" href="#top" data-scroll-to="top">Back to top <svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-arrow-up"/></svg></a>
+    </footer>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/lib/liquid-flow.js"></script>
+  <script src="js/lib/raster.js"></script>
+  <script src="js/lib/youtube-video.js"></script>
+  <script src="js/lib/vimeo-video.js"></script>
+  <script src="js/smooth-scroll.js"></script>
+  <script src="js/chrome.js"></script>
+  <script src="js/hero.js"></script>
+  <script src="js/about.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/game-modals.js"></script>
+  <script src="js/faq.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

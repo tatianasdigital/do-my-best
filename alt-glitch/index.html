@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DO MY BEST — Glitch concept (F7 → F8)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600&display=block" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!--
+    Alternative first-screen concept. Figma file 78XlrFPw66iWdkqGPpQ2ua, Page 3:
+    Frame F7 (17:195) = initial state, Frame F8 (17:239) = destination.
+    Shared Figma assets are loaded from ../assets (the first prototype's folder).
+
+    Each scene holds a .stage: a 1920×1080 box in Figma coordinates, scaled to fit.
+    Bottom → top:
+      scene--f7     : yellow background, Title1 + Title2 in #0E0F0E
+      scene--f8     : black background, Title1 + Title2 in #E3F14A —
+                      revealed by the vertical-column fill (clip-path from fill.js)
+      scene--title2 : Title2 glitch strips (visible only while Title2 glitches)
+      scene--chrome : logo, Social links, Scroll hint, Navigation
+                      (colours switch to F8 after the fill)
+  -->
+  <main class="viewport" id="viewport" data-state="intro" aria-label="DO MY BEST — World builders. World destroyers.">
+
+    <!-- F7: yellow background, dark titles -->
+    <div class="scene scene--f7">
+      <div class="stage">
+        <!-- Invisible mask at the start of the line: Title1 slides in from its left edge -->
+        <div class="title-band title-band--1">
+          <img class="layer title1 title1--f7" src="../assets/f01-title1.svg" width="915.514" height="95.2" alt="World">
+        </div>
+        <!-- Invisible mask as wide as the line: Title2 slides in from its right edge -->
+        <div class="title-band title-band--2">
+          <div class="layer title2 title2--old">
+            <img class="title2__word" src="../assets/f01-title2.svg" width="1177.66" height="95.34" alt="Builders.">
+            <img class="title2__period" src="../assets/f01-title2-period.svg" width="35.5601" height="21.14" alt="">
+          </div>
+        </div>
+        <!-- F8 Title2 after the glitch, still #0E0F0E (wider than the mask, so outside it) -->
+        <img class="layer title2 title2--new" src="assets/f08-title2-dark.svg" width="1654.93" height="95.34" alt="Destroyers.">
+      </div>
+    </div>
+
+    <!-- F8: black background + titles in #E3F14A, revealed column by column -->
+    <div class="scene scene--f8" aria-hidden="true">
+      <div class="stage">
+        <img class="layer title1 title1--f8" src="assets/f08-title1-yellow.svg" width="915.514" height="95.2" alt="">
+        <img class="layer title2 title2--f8" src="assets/f08-title2-yellow.svg" width="1654.93" height="95.34" alt="">
+      </div>
+    </div>
+
+    <!-- Title2 glitch strips (filled by glitch.js) -->
+    <div class="scene scene--title2" aria-hidden="true">
+      <div class="stage">
+        <div class="title2-strips"></div>
+      </div>
+    </div>
+
+    <!-- Chrome: F7 colours, switching to F8 colours after the fill -->
+    <div class="scene scene--chrome">
+      <div class="stage">
+        <img class="logo" src="../assets/logo.png" width="100" height="100" alt="DO MY BEST">
+        <div class="social">
+          <span class="social__icon"><img class="social__f7" src="../assets/f01-social-icon.svg" width="24" height="24" alt=""><img class="social__f8" src="../assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img class="social__f7" src="../assets/f01-social-icon.svg" width="24" height="24" alt=""><img class="social__f8" src="../assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+          <span class="social__icon"><img class="social__f7" src="../assets/f01-social-icon.svg" width="24" height="24" alt=""><img class="social__f8" src="../assets/f02-social-icon.svg" width="24" height="24" alt=""></span>
+        </div>
+        <p class="scroll-hint">( Scroll )</p>
+        <div class="nav"><span class="nav__label">menu</span><span class="nav__icon"><i></i><i></i><i></i></span></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Template for one Title2 glitch strip -->
+  <template id="title2-strip">
+    <div class="t2-strip">
+      <div class="t2-strip__inner">
+        <div class="t2 t2--old t2--ghost">
+          <img class="title2__word" src="../assets/f01-title2-white.svg" width="1177.66" height="95.34" alt="">
+          <img class="title2__period" src="../assets/f01-title2-period-white.svg" width="35.5601" height="21.14" alt="">
+        </div>
+        <div class="t2 t2--old t2--main">
+          <img class="title2__word" src="../assets/f01-title2.svg" width="1177.66" height="95.34" alt="">
+          <img class="title2__period" src="../assets/f01-title2-period.svg" width="35.5601" height="21.14" alt="">
+        </div>
+        <img class="t2 t2--new t2--ghost" src="../assets/f02-title2.svg" width="1654.93" height="95.34" alt="">
+        <img class="t2 t2--new t2--main" src="assets/f08-title2-dark.svg" width="1654.93" height="95.34" alt="">
+      </div>
+    </div>
+  </template>
+
+  <script src="config.js"></script>
+  <script src="glitch.js"></script>
+  <script src="fill.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

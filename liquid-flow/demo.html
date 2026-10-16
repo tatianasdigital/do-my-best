@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Liquid Flow — demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boldonse&display=block" rel="stylesheet">
+  <style>
+    html, body { margin: 0; height: 100%; background: #0e0f0e; overflow: hidden; }
+    .stage { position: relative; width: 1600px; height: 900px; margin: 0 auto; }
+    .word { position: absolute; left: 0; top: 500px; width: 1600px; height: 280px; margin: 0;
+            font: 200px/1.4 'Boldonse', sans-serif; text-transform: uppercase; text-align: center;
+            color: #e3f14a; white-space: nowrap; }
+    .hidden { visibility: hidden; }
+    .pic { position: absolute; left: 1150px; top: 60px; width: 296px; height: 405px; overflow: hidden; }
+    .pic img { position: absolute; left: 0; top: 0; width: 243.96%; height: 100%; }
+    .hint { position: absolute; left: 24px; top: 20px; color: #fff; font: 14px sans-serif; opacity: .6; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <p class="hint">Click: morph the word and melt the picture in / out</p>
+    <p class="word" id="a">Builders.</p>
+    <p class="word hidden" id="b">Destroyers.</p>
+    <div class="pic hidden" id="pic"><img id="img" src="demo-character.png" alt=""></div>
+    <canvas id="fxText"></canvas>
+    <canvas id="fxImage"></canvas>
+  </div>
+  <script src="liquid-flow.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const text = LiquidFlow.create($('fxText'), { mode: 'text', from: $('a'), to: $('b') });
+    const image = LiquidFlow.create($('fxImage'), {
+      mode: 'image',
+      from: null,                                   // nothing → picture (melt-in)
+      to: { image: $('img'), box: { left: 1150, top: 60, width: 296, height: 405, imgW: 296 * 2.4396, imgH: 405 } },
+      params: { displacement: 90, padding: 100 },  // smaller picture → smaller flow
+    });
+    let state = 0, busy = false;
+    Promise.all([document.fonts.load('200px Boldonse'), $('img').decode()]).then(() => {
+      text.build(); image.build();
+      $('fxText').classList.add('hidden'); $('fxImage').classList.add('hidden');
+      window.demoReady = true;
+    });
+    document.addEventListener('click', () => {
+      if (busy || !window.demoReady) return;
+      busy = true;
+      const dir = state ? -1 : 1;
+      text.play({
+        direction: dir,
+        onStart() { $('a').classList.add('hidden'); $('b').classList.add('hidden'); $('fxText').classList.remove('hidden'); },
+        onDone() { $(dir > 0 ? 'b' : 'a').classList.remove('hidden'); $('fxText').classList.add('hidden'); },
+      });
+      image.play({
+        direction: dir,
+        onStart() { $('pic').classList.add('hidden'); $('fxImage').classList.remove('hidden'); },
+        onDone() { $('pic').classList.toggle('hidden', dir < 0); $('fxImage').classList.add('hidden'); state = 1 - state; busy = false; },
+      });
+    });
+    window.fx = { text, image };
+  </script>
+</body>
+</html>
