@@ -586,6 +586,15 @@ html.theme-lime .games-intro { color: var(--c-black); }
   transition: opacity 600ms ease 300ms, transform 800ms var(--ease-out) 300ms, visibility 0s;
 }
 .game-block.is-behind .game-layer { opacity: 1; visibility: visible; transform: none; transition: none; }
+/* TheFinalStationSection: its content (TopSection etc.) rises in already while the circle finishes
+   opening (games.js adds .show-gs1 near the end of the reveal), without the extra delay */
+.games.show-gs1 .game-block[data-game="1"] .game-layer {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity 600ms ease, transform 800ms var(--ease-out), visibility 0s;
+}
 .game-layer__top {
   position: absolute;
   left: var(--margin);

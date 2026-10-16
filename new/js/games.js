@@ -165,6 +165,8 @@
     }
     const s = p < G.revealLength ? 0 : Math.min(3, 1 + Math.floor((p - G.revealLength) / G.stateLength));
     setState(s);
+    // TheFinalStationSection's content comes in a little before the circle has fully opened
+    section.classList.toggle('show-gs1', s === 1 || (s === 0 && k >= G.gs1ContentAt));
     // page colour theme (moyra.co-style): from arriving at GamesSection to the end of the
     // showcase, the page background — About above included — is lime
     // …through the extra screen where DiscordSection slides over the showcase, so the lime

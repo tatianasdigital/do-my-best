@@ -133,6 +133,7 @@ window.DMB_CONFIG = {
     litDuration: 800,             // ms colour change
     revealLength: 0.9,            // viewport heights of scrolling for the GamesNewImage circle to fill the screen (was 1.0 — one wheel step shorter)
     revealEasing: 'inOutCubic',
+    gs1ContentAt: 0.8,            // TheFinalStationSection text starts to rise in at 80 % of the reveal (was: after it, + 0.3 s)
     stateLength: 1.0,             // viewport heights of scrolling per game state
     stateDuration: 1100,          // ms — block transition (GS1 → GS2 → GS3)
     behindScale: 0.9,             // the previous block (background included) shrinks to this…
