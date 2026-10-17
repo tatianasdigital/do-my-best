@@ -36,6 +36,7 @@
   const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobileMq = window.matchMedia('(max-width: 767px)');
   const aboutEl = document.querySelector('.about');
+  const pin = section.querySelector('.games-pin');
 
   section.style.setProperty('--gs-ms', `${G.stateDuration}ms`);
   document.documentElement.style.setProperty('--theme-ms', `${G.litDuration}ms`);
@@ -131,7 +132,14 @@
     const u = Math.min(window.innerWidth / 1920, vh / 1080);
     // + one extra screen at the end: TheBookwalkerSection stays pinned while DiscordSection
     // (pulled up by one screen in CSS) slides up over it
-    section.style.height = `${vh * (2 + G.revealLength + 3 * G.stateLength)}px`;
+    if (mobileMq.matches) {
+      // phones: only the intro + the first card are pinned (one screen + the reveal); the cards follow in the page
+      section.style.height = '';
+      if (pin) pin.style.height = `${vh * (1 + G.revealLength)}px`;
+    } else {
+      if (pin) pin.style.height = '';
+      section.style.height = `${vh * (2 + G.revealLength + 3 * G.stateLength)}px`;
+    }
     top = section.getBoundingClientRect().top + window.scrollY;
     w0 = 302 * u; h0 = 302 * u;   // GamesNewImage: circle Ø604
     // phones (mobile layout): Games artwork starts as a 200 × 200 circle on a 390-px-wide screen (scales with the width)
@@ -144,6 +152,11 @@
 
   /* document y for a given game state (1…3): the middle of its scroll range */
   function scrollYFor(k) {
+    if (mobileMq.matches) {
+      // phones: card 1 right after the reveal; cards 2 / 3 with their top 96 below the top of the screen
+      if (k <= 1) return top + vh * G.revealLength + 2;
+      return top + blocks[k - 1].offsetTop - 96 * vw / 390;
+    }
     return top + vh * (G.revealLength + (k - 1) * G.stateLength + Math.min(0.35, G.stateLength * 0.35)) + 2;
   }
 
@@ -159,8 +172,9 @@
     });
     layers.forEach((el, i) => {
       const n = i + 1;
-      el.toggleAttribute('inert', n !== k);
-      el.setAttribute('aria-hidden', n === k ? 'false' : 'true');
+      const off = mobileMq.matches ? (n === 1 && k < 1) : n !== k;   // phones: the cards in the page are always usable
+      el.toggleAttribute('inert', off);
+      el.setAttribute('aria-hidden', off ? 'true' : 'false');
     });
     segs.forEach((s, i) => s.classList.toggle('is-filled', i < k));
     if (aboutEl) aboutEl.classList.toggle('is-under', k >= 1);   // phones: About (riding along) is hidden under the opened circle
@@ -184,8 +198,22 @@
       shadow.style.opacity = (smooth(0.6, 1, e) * G.shadowOpacity).toFixed(3);
       videoBox.style.setProperty('--shade', smooth(0.6, 1, e).toFixed(3));   // phones: the Artwork shade comes in as the circle opens
     }
-    const s = p < G.revealLength ? 0 : Math.min(3, 1 + Math.floor((p - G.revealLength) / G.stateLength));
+    const mobile = mobileMq.matches;
+    if (mobile) {
+      // phones: Games artwork (Ø200 circle in the middle) stretches into the first card —
+      // 96 from the top, 20 from the sides and from the visible bottom, corners 20
+      const mu = vw / 390, d = 2 * w0, vis = window.innerHeight;
+      const lerp = (a, b) => a + (b - a) * e;
+      const t = lerp((vh - d) / 2, 96 * mu), sx = lerp((vw - d) / 2, 20 * mu);
+      const b = lerp((vh - d) / 2, 20 * mu + Math.max(0, vh - vis)), rad = lerp(w0, 20 * mu);
+      videoBox.style.clipPath = `inset(${t.toFixed(1)}px ${sx.toFixed(1)}px ${b.toFixed(1)}px ${sx.toFixed(1)}px round ${rad.toFixed(1)}px)`;
+      intro.style.opacity = (1 - smooth(0.55, 0.9, e)).toFixed(3);   // GAMES / label give way to the card
+    } else if (videoBox.style.clipPath) { videoBox.style.clipPath = ''; intro.style.opacity = ''; }
+    // phones: after the reveal nothing changes with the scroll any more (state stays 1)
+    const s = p < G.revealLength ? 0 : (mobile ? 1 : Math.min(3, 1 + Math.floor((p - G.revealLength) / G.stateLength)));
     setState(s);
+    if (mobile && (s === 1 || k >= G.gs1ContentAt)) cardIn(blocks[0]);
+    else if (mobile) blocks[0].classList.remove('is-in');   // back before the reveal: it comes in (and glides) again next time
     // TheFinalStationSection's content comes in a little before the circle has fully opened
     section.classList.toggle('show-gs1', s === 1 || (s === 0 && k >= G.gs1ContentAt));
     // page colour theme (moyra.co-style): from arriving at GamesSection to the end of the
@@ -207,7 +235,7 @@
     // DiscordSection slides over the pinned TheBookwalkerSection: 0 → 1 over the last screen.
     // The block underneath moves back like the game blocks do (scale, darken, rounded corners).
     const cover = Math.min(1, Math.max(0, p - (G.revealLength + 3 * G.stateLength)));
-    const covering = cover > 0 && !rm.matches;
+    const covering = !mobile && cover > 0 && !rm.matches;   // phones: no hand-over effect
     section.classList.toggle('is-covering', covering);
     if (covering) {
       const sc = 1 - (1 - G.behindScale) * cover;
@@ -225,11 +253,11 @@
     // touch screens (phones): the same settling, with no pause — the moment the finger lets go (or the
     // swipe's momentum carries the page into the hand-over), DiscordSection glides to the top of the
     // screen; scrolling back up returns to the game
-    if (touchUI && dir !== 0 && !touchSnapping) {
+    if (touchUI && !mobile && dir !== 0 && !touchSnapping) {
       touchDir = dir > 0 ? 1 : -1;
       if (!fingerDown) touchSnap();
     }
-    if (S && S.enabled && !touchUI && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
+    if (S && S.enabled && !touchUI && !mobile && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
       const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
       S.scrollTo(dir > 0 ? z1 : z0, { lock: true, duration: window.DMB_CONFIG.smooth.snapDuration });
     }
@@ -245,7 +273,7 @@
   }
   function touchSnap() {
     const S = window.SmoothScroll;
-    if (fingerDown || touchSnapping || !S) return;
+    if (fingerDown || touchSnapping || !S || mobileMq.matches) return;
     const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
     const cover = (window.scrollY - z0) / vh;
     if (cover <= 0.002 || cover >= 0.998) return;
@@ -274,6 +302,46 @@
     window.addEventListener('touchend', up, { passive: true });
     window.addEventListener('touchcancel', up, { passive: true });
   }
+
+  /* ---------- phones: the cards come in as they scroll into view; their genre tags glide once ----------
+     The tags line is wider than the card: once a card comes into view, after a moment the line glides
+     slowly to its end, rests, and glides back to the start (once — no endless loop). */
+  const TAG_SPEED = 18;                         // px per second
+  function glideTags(block) {
+    if (!mobileMq.matches || rm.matches) return;
+    const ul = [...block.querySelectorAll('.game-tags')].find((el) => el.offsetParent !== null);
+    if (!ul) return;
+    const lis = [...ul.children];
+    lis.forEach((li) => li.getAnimations().forEach((a) => a.cancel()));
+    const over = ul.scrollWidth - ul.clientWidth;
+    if (over < 2) return;
+    const travel = (over / TAG_SPEED) * 1000, rest = 1400;
+    const total = 700 + travel + rest + travel;
+    const at = (ms) => ms / total;
+    const frames = [
+      { transform: 'translateX(0)', offset: 0 },
+      { transform: 'translateX(0)', offset: at(700), easing: 'ease-in-out' },
+      { transform: `translateX(${-over}px)`, offset: at(700 + travel) },
+      { transform: `translateX(${-over}px)`, offset: at(700 + travel + rest), easing: 'ease-in-out' },
+      { transform: 'translateX(0)', offset: 1 },
+    ];
+    lis.forEach((li) => li.animate(frames, { duration: total }));
+  }
+  function cardIn(block) {
+    if (block.classList.contains('is-in')) return;
+    block.classList.add('is-in');
+    glideTags(block);
+  }
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const en of entries) {
+        if (!mobileMq.matches) continue;
+        if (en.isIntersecting) cardIn(en.target);
+        else if (en.target !== blocks[0]) en.target.classList.remove('is-in');   // comes in again next time
+      }
+    }, { threshold: 0.12 });
+    blocks.slice(1).forEach((b) => io.observe(b));
+  } else blocks.forEach((b) => b.classList.add('is-in'));
 
   window.DMBGames = {
     layout,
