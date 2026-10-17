@@ -1478,8 +1478,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
     top: calc(96 * var(--u));
     left: var(--margin);
     right: var(--margin);
-    bottom: calc(20 * var(--u));
-    bottom: calc(20 * var(--u) + 100lvh - 100dvh);
+    bottom: calc(20 * var(--u));   /* fixed to the stage: Game actions don't move when the browser bars show / hide */
   }
   .game-block[data-game="2"] .game-layer, .game-block[data-game="3"] .game-layer { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition: none; }
   .game-layer__top { display: contents; }

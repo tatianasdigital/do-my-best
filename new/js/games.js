@@ -204,13 +204,16 @@
       // phones: Games artwork stretches into the first card —
       // 96 from the top, 20 from the sides and from the visible bottom, corners 20
       // (Games artwork 146:2041 starts as a 140 × 250 rounded rectangle, corners 20, in the middle)
-      const mu = vw / 390, sw = 140 * mu, sh = 250 * mu, vis = window.innerHeight;
+      const mu = vw / 390, sw = 140 * mu, sh = 250 * mu;
       const lerp = (a, b) => a + (b - a) * e;
       const t = lerp((vh - sh) / 2, 96 * mu), sx = lerp((vw - sw) / 2, 20 * mu);
-      const b = lerp((vh - sh) / 2, 20 * mu + Math.max(0, vh - vis)), rad = 20 * mu;
+      // (fixed to the stage, not to the browser bars: nothing in the card moves while they show / hide)
+      const b = lerp((vh - sh) / 2, 20 * mu), rad = 20 * mu;
       videoBox.style.clipPath = `inset(${t.toFixed(1)}px ${sx.toFixed(1)}px ${b.toFixed(1)}px ${sx.toFixed(1)}px round ${rad.toFixed(1)}px)`;
       intro.style.opacity = (1 - smooth(0.55, 0.9, e)).toFixed(3);   // GAMES / label give way to the card
-    } else if (videoBox.style.clipPath) { videoBox.style.clipPath = ''; intro.style.opacity = ''; }
+      // About fades out as soon as Games artwork starts to grow: nothing of it shows behind the card
+      if (aboutEl) aboutEl.style.opacity = (1 - smooth(0, 0.3, e)).toFixed(3);
+    } else if (videoBox.style.clipPath) { videoBox.style.clipPath = ''; intro.style.opacity = ''; if (aboutEl) aboutEl.style.opacity = ''; }
     // phones: after the reveal nothing changes with the scroll any more (state stays 1)
     const s = p < RL() ? 0 : (mobile ? 1 : Math.min(3, 1 + Math.floor((p - RL()) / G.stateLength)));
     setState(s);
@@ -251,6 +254,10 @@
     // SmoothScroll locks the wheel until the gesture is over, so it stays there until the next scroll
     const dir = y - lastY;
     lastY = y;
+    // phones: the reveal plays by itself — the moment the reader scrolls into it, the page glides (wheel /
+    // swipe locked meanwhile) to where the first card is fully open, so a swipe can't carry on past it;
+    // scrolling back up into it plays it back to the start
+    if (mobile && dir !== 0) revealSnap(p, dir);
     const S = window.SmoothScroll;
     // touch screens (phones): the same settling, with no pause — the moment the finger lets go (or the
     // swipe's momentum carries the page into the hand-over), DiscordSection glides to the top of the
@@ -264,6 +271,27 @@
       S.scrollTo(dir > 0 ? z1 : z0, { lock: true, duration: window.DMB_CONFIG.smooth.snapDuration });
     }
   }
+
+  /* ---------- phones: the reveal runs as one move ---------- */
+  let revealGliding = false;
+  function revealSnap(p, dir) {
+    const S = window.SmoothScroll;
+    if (!S || revealGliding || rm.matches) return;
+    const R = RL(), eps = 0.015;
+    let to = null;
+    if (dir > 0 && p > eps && p < R - eps) to = top + vh * R + 1;      // opening: land on the open card
+    else if (dir < 0 && p > eps && p < R - eps) to = top;              // closing: back to Games artwork
+    if (to === null) return;
+    revealGliding = true;
+    html.classList.add('is-locked');                                  // stops the swipe's momentum
+    const ms = Math.max(320, REVEAL_GLIDE_MS * Math.abs(to - window.scrollY) / (vh * R));
+    S.scrollTo(to, { duration: ms, lock: true, done: () => {
+      revealGliding = false;
+      const busy = (window.DMBHero && window.DMBHero.locksPage) || (window.DMBGameModals && window.DMBGameModals.isOpen) || (window.DMBMobileMenu && window.DMBMobileMenu.isOpen);
+      if (!busy) html.classList.remove('is-locked');
+    } });
+  }
+  const REVEAL_GLIDE_MS = 900;                // the whole reveal; a part of it takes proportionally less
 
   /* ---------- touch: DiscordSection settles at the top after a swipe ---------- */
   let fingerDown = false, touchDir = 1, touchSnapping = false, touchY0 = 0;
