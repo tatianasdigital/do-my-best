@@ -37,6 +37,7 @@
   const mobileMq = window.matchMedia('(max-width: 767px)');
   const aboutEl = document.querySelector('.about');
   const pin = section.querySelector('.games-pin');
+  const RL = () => (mobileMq.matches && G.mobileRevealLength ? G.mobileRevealLength : G.revealLength);   // reveal length in screens
 
   section.style.setProperty('--gs-ms', `${G.stateDuration}ms`);
   document.documentElement.style.setProperty('--theme-ms', `${G.litDuration}ms`);
@@ -135,10 +136,10 @@
     if (mobileMq.matches) {
       // phones: only the intro + the first card are pinned (one screen + the reveal); the cards follow in the page
       section.style.height = '';
-      if (pin) pin.style.height = `${vh * (1 + G.revealLength)}px`;
+      if (pin) pin.style.height = `${vh * (1 + RL())}px`;
     } else {
       if (pin) pin.style.height = '';
-      section.style.height = `${vh * (2 + G.revealLength + 3 * G.stateLength)}px`;
+      section.style.height = `${vh * (2 + RL() + 3 * G.stateLength)}px`;
     }
     top = section.getBoundingClientRect().top + window.scrollY;
     w0 = 302 * u; h0 = 302 * u;   // GamesNewImage: circle Ø604
@@ -154,10 +155,10 @@
   function scrollYFor(k) {
     if (mobileMq.matches) {
       // phones: card 1 right after the reveal; cards 2 / 3 with their top 96 below the top of the screen
-      if (k <= 1) return top + vh * G.revealLength + 2;
+      if (k <= 1) return top + vh * RL() + 2;
       return top + blocks[k - 1].offsetTop - 96 * vw / 390;
     }
-    return top + vh * (G.revealLength + (k - 1) * G.stateLength + Math.min(0.35, G.stateLength * 0.35)) + 2;
+    return top + vh * (RL() + (k - 1) * G.stateLength + Math.min(0.35, G.stateLength * 0.35)) + 2;
   }
 
   function setState(k) {
@@ -184,7 +185,7 @@
 
   function update(y) {
     const p = (y - top) / vh;                       // screens scrolled inside the section
-    const k = Math.min(1, Math.max(0, p / G.revealLength));
+    const k = Math.min(1, Math.max(0, p / RL()));
     const e = rm.matches ? (k >= 0.5 ? 1 : 0) : (ease[G.revealEasing] || ease.inOutCubic)(k);
     if (Math.abs(e - lastE) > 0.0005) {
       lastE = e;
@@ -200,17 +201,18 @@
     }
     const mobile = mobileMq.matches;
     if (mobile) {
-      // phones: Games artwork (Ø200 circle in the middle) stretches into the first card —
+      // phones: Games artwork stretches into the first card —
       // 96 from the top, 20 from the sides and from the visible bottom, corners 20
-      const mu = vw / 390, d = 2 * w0, vis = window.innerHeight;
+      // (Games artwork 146:2041 starts as a 140 × 250 rounded rectangle, corners 20, in the middle)
+      const mu = vw / 390, sw = 140 * mu, sh = 250 * mu, vis = window.innerHeight;
       const lerp = (a, b) => a + (b - a) * e;
-      const t = lerp((vh - d) / 2, 96 * mu), sx = lerp((vw - d) / 2, 20 * mu);
-      const b = lerp((vh - d) / 2, 20 * mu + Math.max(0, vh - vis)), rad = lerp(w0, 20 * mu);
+      const t = lerp((vh - sh) / 2, 96 * mu), sx = lerp((vw - sw) / 2, 20 * mu);
+      const b = lerp((vh - sh) / 2, 20 * mu + Math.max(0, vh - vis)), rad = 20 * mu;
       videoBox.style.clipPath = `inset(${t.toFixed(1)}px ${sx.toFixed(1)}px ${b.toFixed(1)}px ${sx.toFixed(1)}px round ${rad.toFixed(1)}px)`;
       intro.style.opacity = (1 - smooth(0.55, 0.9, e)).toFixed(3);   // GAMES / label give way to the card
     } else if (videoBox.style.clipPath) { videoBox.style.clipPath = ''; intro.style.opacity = ''; }
     // phones: after the reveal nothing changes with the scroll any more (state stays 1)
-    const s = p < G.revealLength ? 0 : (mobile ? 1 : Math.min(3, 1 + Math.floor((p - G.revealLength) / G.stateLength)));
+    const s = p < RL() ? 0 : (mobile ? 1 : Math.min(3, 1 + Math.floor((p - RL()) / G.stateLength)));
     setState(s);
     if (mobile && (s === 1 || k >= G.gs1ContentAt)) cardIn(blocks[0]);
     else if (mobile) blocks[0].classList.remove('is-in');   // back before the reveal: it comes in (and glides) again next time
@@ -220,7 +222,7 @@
     // showcase, the page background — About above included — is lime
     // …through the extra screen where DiscordSection slides over the showcase, so the lime
     // background stays behind the scaled-back blocks the whole time
-    const end = G.revealLength + 3 * G.stateLength + 1.05;
+    const end = RL() + 3 * G.stateLength + 1.05;
     // phones (HomePageMobile): the page stays dark — no lime theme
     const lit = !mobileMq.matches && p > G.litAt && p < end;
     section.classList.toggle('is-lit', lit);
@@ -234,7 +236,7 @@
 
     // DiscordSection slides over the pinned TheBookwalkerSection: 0 → 1 over the last screen.
     // The block underneath moves back like the game blocks do (scale, darken, rounded corners).
-    const cover = Math.min(1, Math.max(0, p - (G.revealLength + 3 * G.stateLength)));
+    const cover = Math.min(1, Math.max(0, p - (RL() + 3 * G.stateLength)));
     const covering = !mobile && cover > 0 && !rm.matches;   // phones: no hand-over effect
     section.classList.toggle('is-covering', covering);
     if (covering) {
@@ -258,7 +260,7 @@
       if (!fingerDown) touchSnap();
     }
     if (S && S.enabled && !touchUI && !mobile && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
-      const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
+      const z0 = top + vh * (RL() + 3 * G.stateLength), z1 = z0 + vh;
       S.scrollTo(dir > 0 ? z1 : z0, { lock: true, duration: window.DMB_CONFIG.smooth.snapDuration });
     }
   }
@@ -274,7 +276,7 @@
   function touchSnap() {
     const S = window.SmoothScroll;
     if (fingerDown || touchSnapping || !S || mobileMq.matches) return;
-    const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
+    const z0 = top + vh * (RL() + 3 * G.stateLength), z1 = z0 + vh;
     const cover = (window.scrollY - z0) / vh;
     if (cover <= 0.002 || cover >= 0.998) return;
     touchSnapping = true;

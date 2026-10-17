@@ -1310,7 +1310,10 @@ html.theme-lime .games-intro { color: var(--c-black); }
     line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
-    transition: color 150ms ease, border-color 150ms ease;
+    background: rgba(14, 15, 14, 0.24);           /* 137:845: the page under it is blurred */
+    -webkit-backdrop-filter: blur(3px);
+            backdrop-filter: blur(3px);
+    transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
   }
   .menu-button__text { text-box: trim-both cap alphabetic; }
   .menu-button__icon {
@@ -1322,7 +1325,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
     transition: background-color 150ms ease, color 150ms ease;
   }
   .menu-button__icon svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
-  .topbar[data-theme="bright"] .menu-button { border-color: var(--c-black); color: var(--c-black); }
+  .topbar[data-theme="bright"] .menu-button { border-color: var(--c-black); color: var(--c-black); background: transparent; }
   .topbar[data-theme="bright"] .menu-button__icon { background: var(--c-black); color: var(--c-yellow); }
 
   /* ---------- ModalMenu (137:1307) ---------- */
@@ -1408,12 +1411,12 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .about__stage { position: static; height: auto; overflow: visible; padding: calc(60 * var(--u)) var(--margin) calc(72 * var(--u)); }
   /* 72 between the About text and RELEASED GAMES: the pinned Games stage (label at 50% − 200) is pulled
      up under About's bottom; its top part is empty and transparent, so nothing of About is covered */
-  .about { margin-bottom: calc(160 * var(--u) - 50vh); margin-bottom: calc(160 * var(--u) - 50lvh); }
+  .about { margin-bottom: calc(135 * var(--u) - 50vh); margin-bottom: calc(135 * var(--u) - 50lvh); }
   /* About section rides along with the Games screen: it stops moving at the moment the Games stage pins
      (about.js measures its height into --about-h) and stays above RELEASED GAMES while the circle grows;
      once the circle has covered the screen it is hidden underneath (games.js: .is-under) */
   .about-games { display: block; }
-  .about { position: sticky; top: calc(50vh - 160 * var(--u) - var(--about-h, 0px)); top: calc(50lvh - 160 * var(--u) - var(--about-h, 0px)); }
+  .about { position: sticky; top: calc(50vh - 135 * var(--u) - var(--about-h, 0px)); top: calc(50lvh - 135 * var(--u) - var(--about-h, 0px)); }
   .about.is-under { visibility: hidden; }
   .games, .games__stage { background: transparent; }
   .reading-progress { display: none; }
@@ -1434,7 +1437,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .game-block[data-game="1"] { margin-top: -100vh; margin-top: -100lvh; inset: 0 auto auto auto; width: 100%; clip-path: none; transform: none !important; filter: none !important; visibility: visible !important; transition: none; }
   .games-intro { inset: 0 auto auto auto; width: 100%; overflow: hidden; transition: opacity 300ms ease; }   /* the GAMES line must not widen the page */
   .games.is-revealed .games-intro { visibility: visible; opacity: 0; }   /* JS fades it while the card fills out */
-  .games-intro__label { top: calc(50% - 160 * var(--u)); font-size: 12px; color: #a1a19b; }   /* 36 above the Ø200 Games artwork */
+  .games-intro__label { top: calc(50% - 135 * var(--u)); font-size: 12px; color: #a1a19b; }   /* 10 above the top of Games artwork (140 × 250) */
   .games-intro__title { left: 0; top: calc(50% - 45 * var(--u)); font-size: calc(64 * var(--u)); }
   .games-shadow, .small-progress { display: none; }
   /* the cards' artwork + Artwork shade */
@@ -1485,15 +1488,28 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .game-tags li + li::before { width: 4px; height: 4px; min-width: 0; min-height: 0; margin: 0 4px; }
   .game-title { order: 0; font-size: calc(32 * var(--u)); white-space: normal; }
   .game-block[data-game="2"] .game-title br { display: none; }
+  .game-block[data-game="3"] .game-bg__poster {
+    inset: auto;
+    left: calc(246 * var(--u));
+    top: calc(-13 * var(--u));
+    width: auto;
+    height: max(calc(647 * var(--u)), calc(100% + 13 * var(--u)));
+    aspect-ratio: 1024 / 647;
+    transform: translateX(-50%);
+  }
   /* Game actions: BUY NOW + WATCH TRAILER side by side, LEARN MORE under them, the platforms below */
   .game-buttons {
     order: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     gap: calc(8 * var(--u));
     margin-top: auto;
     padding-top: calc(28 * var(--u));
   }
+  .game-buttons .sec-button { order: 0; }
+  .game-buttons .cta--trailer { order: 1; }
+  .game-buttons .cta--buy { order: 2; }
   .cta, .sec-button {
     justify-content: center;
     gap: 0;
@@ -1504,14 +1520,13 @@ html.theme-lime .games-intro { color: var(--c-black); }
   }
   .cta__icon { display: none; }
   .game-buttons .sec-button {
-    grid-column: 1 / -1;
     padding: 0 calc(20 * var(--u));
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(0, 0, 0, 0.16);
     -webkit-backdrop-filter: blur(3.15px);
             backdrop-filter: blur(3.15px);
   }
-  .available { order: 2; position: static; align-items: center; gap: 0; margin-top: calc(16 * var(--u)); padding-bottom: calc(8 * var(--u)); }
+  .available { order: 2; position: static; align-items: center; gap: 0; margin-top: calc(24 * var(--u)); padding-bottom: calc(8 * var(--u)); }
   .available__label { display: none; }
   .available__icons { justify-content: center; gap: calc(20 * var(--u)); }
   .badge { height: calc(18 * var(--u)); }
@@ -1519,17 +1534,17 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .badge--xbox { width: calc(91 * var(--u)); }
   .badge--pc { width: calc(25 * var(--u)); }
 
-  /* ---------- Discord (132:5904, 682 high) ---------- */
-  .discord { height: calc(682 * var(--u)); }
-  .discord__text { top: calc(101 * var(--u)); right: var(--margin); width: auto; font-size: 14px; line-height: 1; }
-  /* Character artwork placed as in Figma (the same picture as on desktop: 513 × 679 at x −170 / y 170),
-     cut off with its fade 671 below the section's top */
-  .discord__character { left: calc(-170 * var(--u)); top: calc(170 * var(--u)); width: calc(513 * var(--u)); height: calc(679 * var(--u)); object-fit: fill; clip-path: inset(0 0 calc(178 * var(--u)) 0); }
-  .discord__fade { left: 0; top: calc(457 * var(--u)); width: 100%; height: calc(214 * var(--u)); background: linear-gradient(180deg, rgba(14, 15, 14, 0), #0e0f0e); }
+  /* ---------- Discord (132:5904, 606 high) ---------- */
+  .discord { height: calc(606 * var(--u)); }
+  .discord__text { top: calc(48 * var(--u)); right: auto; width: calc(236 * var(--u)); font-size: 14px; line-height: 1; }
+  /* Character artwork placed as in Figma (the same picture as on desktop: 513 × 679 at x −170 / y 119),
+     cut off with its fade 595 below the section's top */
+  .discord__character { left: calc(-170 * var(--u)); top: calc(119 * var(--u)); width: calc(513 * var(--u)); height: calc(679 * var(--u)); object-fit: fill; clip-path: inset(0 0 calc(203 * var(--u)) 0); }
+  .discord__fade { left: 0; top: calc(402 * var(--u)); width: 100%; height: calc(198 * var(--u)); background: linear-gradient(180deg, rgba(14, 15, 14, 0), #0e0f0e); }
   .discord__fade::after { content: none; }
-  .discord__label { top: calc(339 * var(--u)); font-size: 12px; line-height: 1.4; }
+  .discord__label { top: calc(280 * var(--u)); font-weight: 500; font-size: 12px; line-height: 1.4; }
   .discord-button {
-    top: calc(368 * var(--u));
+    top: calc(309 * var(--u));
     width: calc(100% - 40 * var(--u));
     height: calc(80 * var(--u));
     justify-content: space-between;

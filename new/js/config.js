@@ -132,6 +132,7 @@ window.DMB_CONFIG = {
     litAt: -0.5,                  // the background turns #E3F14A (GamesTexts #0E0F0E) once the stage is this far in
                                   // (screens; -1 = its top just entered the viewport, 0 = it fills the viewport)
     litDuration: 800,             // ms colour change
+    mobileRevealLength: 0.5,      // phones: screens of scrolling for Games artwork to stretch into the first card
     revealLength: 0.9,            // viewport heights of scrolling for the GamesNewImage circle to fill the screen (was 1.0 — one wheel step shorter)
     revealEasing: 'inOutCubic',
     gs1ContentAt: 0.8,            // TheFinalStationSection text starts to rise in at 80 % of the reveal (was: after it, + 0.3 s)
