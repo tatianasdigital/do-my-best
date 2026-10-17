@@ -79,6 +79,8 @@
   /* ---------- Layout ---------- */
   function layout() {
     u = Math.min(window.innerWidth / CFG.frame.width, window.innerHeight / CFG.frame.height);
+    // phones (mobile layout): the 1920-px scale would make the liquid edge almost flat — keep it visible
+    if (window.matchMedia('(max-width: 767px)').matches) u = Math.max(u, window.innerWidth / 700);
     sizeMasks();
     if (state === -1) return;
     // keep the titles that are already "out" in place, the hidden ones parked outside their masks
@@ -127,6 +129,8 @@
 
   /* ---------- Two-step timeline (burn4) ---------- */
   const S = H.steps;
+  // phones (mobile layout): FirstScreen1 → FirstScreen2 plays faster
+  const revealMs = () => (window.matchMedia('(max-width: 767px)').matches && S.mobileRevealDuration ? S.mobileRevealDuration : S.revealDuration);
   const ease = {
     outCubic: (k) => 1 - Math.pow(1 - k, 3),
     inCubic: (k) => k * k * k,
@@ -276,14 +280,14 @@
     if (from === 0 && target === 2) {                    // one gesture: burn starts and opens fully by itself
       root.classList.add('is-burning', 'is-f1-hidden');
       T = 0;
-      showTitles(timeToReach(0, TEND, S.revealDuration, R, revealProgress(H.titles.revealAt)));
-      chromeForward(0, TEND, S.revealDuration, R);
-      animateTo(TEND, S.revealDuration, R, () => { stopLoop(); root.classList.remove('is-burning'); done(); });
+      showTitles(timeToReach(0, TEND, revealMs(), R, revealProgress(H.titles.revealAt)));
+      chromeForward(0, TEND, revealMs(), R);
+      animateTo(TEND, revealMs(), R, () => { stopLoop(); root.classList.remove('is-burning'); done(); });
     } else if (from === 2 && target === 0) {             // back up at the very top: the same, reversed
       root.classList.add('is-burning');
       T = TEND;
-      chromeReverse(TEND, S.revealDuration / S.reverseSpeed, R);
-      animateTo(0, S.revealDuration / S.reverseSpeed, R, () => {
+      chromeReverse(TEND, revealMs() / S.reverseSpeed, R);
+      animateTo(0, revealMs() / S.reverseSpeed, R, () => {
         stopLoop();
         root.classList.remove('is-burning', 'is-f1-hidden');
         done();
@@ -376,6 +380,8 @@
   function start() {
     root.classList.toggle('is-fade', reducedMotion || !fx);
     u = Math.min(window.innerWidth / CFG.frame.width, window.innerHeight / CFG.frame.height);
+    // phones (mobile layout): the 1920-px scale would make the liquid edge almost flat — keep it visible
+    if (window.matchMedia('(max-width: 767px)').matches) u = Math.max(u, window.innerWidth / 700);
     sizeMasks();
     hideF2TitlesInstant();
     setIntroStart();

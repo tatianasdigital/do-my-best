@@ -86,6 +86,33 @@
     smooth.wheel(e);
   }, { passive: false });
 
+  /* ---------- touch router (phones, tablets): a swipe plays the first-screen step ----------
+     Desktop mice / trackpads never fire touch events, so the desktop behaviour is unchanged.
+     While the first screen still locks the page, a swipe up plays FirstScreen1 → FirstScreen2;
+     at the very top of the page, a swipe down plays it back. Everything else scrolls natively. */
+  let touchY0 = null, touchUsed = false;
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) { touchY0 = null; return; }
+    touchY0 = e.touches[0].clientY; touchUsed = false;
+  }, { passive: true });
+  window.addEventListener('touchmove', (e) => {
+    if (touchY0 === null) return;
+    if (overlay.isOpen || (window.DMBGameModals && window.DMBGameModals.isOpen) || (window.DMBMobileMenu && window.DMBMobileMenu.isOpen)) return;
+    const dy = touchY0 - e.touches[0].clientY;            // > 0: finger moves up (scroll down)
+    const atTop = window.scrollY <= 1;
+    if (hero.locksPage) {
+      e.preventDefault();
+      if (!touchUsed && Math.abs(dy) > 30) { touchUsed = true; hero.step(dy > 0 ? 1 : -1); }
+      return;
+    }
+    if (atTop && dy < -30 && !touchUsed && hero.state === 2) {
+      e.preventDefault();
+      touchUsed = true;
+      hero.step(-1);
+    }
+  }, { passive: false });
+  window.addEventListener('touchend', () => { touchY0 = null; }, { passive: true });
+
   /* ---------- keyboard router ---------- */
   const DOWN = ['ArrowDown', 'PageDown', ' ', 'Spacebar'];
   const UP = ['ArrowUp', 'PageUp', 'Home'];

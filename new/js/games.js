@@ -34,6 +34,7 @@
   const segs = [...section.querySelectorAll('.small-progress__seg')];
   const progress = section.querySelector('.small-progress');
   const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mobileMq = window.matchMedia('(max-width: 767px)');
 
   section.style.setProperty('--gs-ms', `${G.stateDuration}ms`);
   document.documentElement.style.setProperty('--theme-ms', `${G.litDuration}ms`);
@@ -108,6 +109,8 @@
   let state = -1;
   let lastE = -1;
   let lastY = window.scrollY;
+  // touch screens scroll natively (finger + momentum): no automatic settling there
+  const touchUI = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
   function layout() {
     vh = window.innerHeight;
@@ -117,6 +120,8 @@
     section.style.height = `${vh * (2 + G.revealLength + 3 * G.stateLength)}px`;
     top = section.getBoundingClientRect().top + window.scrollY;
     w0 = 302 * u; h0 = 302 * u;   // GamesNewImage: circle Ø604
+    // phones (mobile layout, HomePageMobile 132:5609): the circle starts at Ø270 on a 390-px-wide screen (scales with the width)
+    if (window.matchMedia('(max-width: 767px)').matches) { w0 = h0 = (stage.clientWidth || window.innerWidth) * 135 / 390; }
     vw = stage.clientWidth || window.innerWidth;
     measureChrome();
     lastE = -1; state = -1;
@@ -162,6 +167,7 @@
       lastR = w0 + (rMax - w0) * e;
       videoBox.style.setProperty('--reveal-r', `${lastR.toFixed(2)}px`);
       shadow.style.opacity = (smooth(0.6, 1, e) * G.shadowOpacity).toFixed(3);
+      videoBox.style.setProperty('--shade', smooth(0.6, 1, e).toFixed(3));   // phones: the Artwork shade comes in as the circle opens
     }
     const s = p < G.revealLength ? 0 : Math.min(3, 1 + Math.floor((p - G.revealLength) / G.stateLength));
     setState(s);
@@ -172,7 +178,8 @@
     // …through the extra screen where DiscordSection slides over the showcase, so the lime
     // background stays behind the scaled-back blocks the whole time
     const end = G.revealLength + 3 * G.stateLength + 1.05;
-    const lit = p > G.litAt && p < end;
+    // phones (HomePageMobile): the page stays dark — no lime theme
+    const lit = !mobileMq.matches && p > G.litAt && p < end;
     section.classList.toggle('is-lit', lit);
     document.documentElement.classList.toggle('theme-lime', lit);   // text colours (CSS transitions)
     setLit(lit);                                                     // background (one clock)
@@ -200,10 +207,41 @@
     const dir = y - lastY;
     lastY = y;
     const S = window.SmoothScroll;
-    if (S && S.enabled && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
+    // touch screens (phones): the same settling, once the finger is off and the swipe's momentum has
+    // run out — scrolling on from the last game screen brings DiscordSection to the top of the screen,
+    // scrolling back up returns to the game
+    if (touchUI && dir !== 0 && S && !S.tweening) {
+      touchDir = dir > 0 ? 1 : -1;
+      if (!fingerDown) armTouchSnap();
+    }
+    if (S && S.enabled && !touchUI && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
       const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
       S.scrollTo(dir > 0 ? z1 : z0, { lock: true, duration: window.DMB_CONFIG.smooth.snapDuration });
     }
+  }
+
+  /* ---------- touch: DiscordSection settles at the top after a swipe ---------- */
+  let fingerDown = false, touchDir = 1, touchTimer = 0, touchSnapping = false;
+  function armTouchSnap() { clearTimeout(touchTimer); touchTimer = setTimeout(touchSnap, 140); }
+  function touchSnap() {
+    const S = window.SmoothScroll;
+    if (fingerDown || !S || S.tweening) return;
+    const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
+    const cover = (window.scrollY - z0) / vh;
+    if (cover <= 0.002 || cover >= 0.998) return;
+    touchSnapping = true;
+    S.scrollTo(touchDir > 0 ? z1 : z0, { duration: window.DMB_CONFIG.smooth.snapDuration, done: () => { touchSnapping = false; } });
+  }
+  if (touchUI) {
+    window.addEventListener('touchstart', () => {
+      fingerDown = true;
+      clearTimeout(touchTimer);
+      // a new touch takes over from a settling scroll (no fighting the finger)
+      if (touchSnapping && window.SmoothScroll) { window.SmoothScroll.stop(); touchSnapping = false; }
+    }, { passive: true });
+    const up = () => { fingerDown = false; armTouchSnap(); };
+    window.addEventListener('touchend', up, { passive: true });
+    window.addEventListener('touchcancel', up, { passive: true });
   }
 
   window.DMBGames = {

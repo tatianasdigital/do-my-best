@@ -65,7 +65,16 @@
     bar.setAttribute('aria-valuemax', lines.length);
   }
 
+  // phones (HomePageMobile): the About text is static and white — no pinning, no progress bar
+  const mobile = window.matchMedia('(max-width: 767px)');
+
   function layout() {
+    if (mobile.matches) {
+      section.style.height = '';
+      top = section.getBoundingClientRect().top + window.scrollY;
+      current = -1;
+      return;
+    }
     measureLines();
     const vh = window.innerHeight;
     stagePx = A.stageLength * vh;
@@ -101,6 +110,7 @@
   }
 
   function update(y) {
+    if (mobile.matches) return;
     const rel = y - top;
     const k = rel < -1 ? 0 : Math.min(lines.length, 1 + Math.floor(Math.max(0, rel) / stagePx));
     if (k === current) return;

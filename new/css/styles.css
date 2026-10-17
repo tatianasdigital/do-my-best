@@ -1249,3 +1249,322 @@ html.theme-lime .games-intro { color: var(--c-black); }
 /* GamesShowcase: once the circle has covered the screen, the running GAMES line and GamesLabel are
    hidden — only the lime background is left behind the blocks as they scale back */
 .games.is-revealed .games-intro, .games.is-covering .games-intro { visibility: hidden; }
+
+/* phones-only elements: never shown in the desktop layout */
+.menu-button { display: none; }
+.mobile-menu[hidden] { display: none; }
+
+/* =====================================================================
+   MOBILE (phones, < 768 px wide) — HomePageMobile (132:5609), ModalMenu (137:1307),
+   TheFinalStationSectionModalMobile (137:1046), video modal (137:1249).
+   Everything below applies ONLY here; the desktop layout above is untouched.
+   1u = 1 px of the 390-px-wide Figma frame, scaling with the phone's width.
+   ===================================================================== */
+@media (max-width: 767px) {
+  :root {
+    --u: calc(100vw / 390);
+    --margin: calc(20 * var(--u));
+    --fs-16: 14px;
+    --fs-13: 12px;
+  }
+  html { overscroll-behavior-y: none; }
+
+  /* ---------- Top bar (137:693): logo 56 + MenuMobile pill; no socials, no NavigationNew ---------- */
+  .topbar { top: calc(20 * var(--u)); height: calc(56 * var(--u)); }
+  .topbar[data-theme="bright"] { transform: none; }
+  .topbar__logo { width: calc(56 * var(--u)); }
+  .topbar__actions { display: none; }
+  .navigation { display: none; }
+
+  /* MenuMobile (137:684): 48 high, text 14 + a 40 circle with the menu icon; MenuMobileBlack on lime */
+  .menu-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: calc(16 * var(--u));
+    height: calc(48 * var(--u));
+    padding: 0 calc(4 * var(--u)) 0 calc(20 * var(--u));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: calc(49 * var(--u));
+    color: var(--c-white);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .menu-button__text { text-box: trim-both cap alphabetic; }
+  .menu-button__icon {
+    display: grid; place-items: center;
+    width: calc(40 * var(--u)); height: calc(40 * var(--u));
+    border-radius: 50%;
+    background: var(--c-white);
+    color: var(--c-black);
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+  .menu-button__icon svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+  .topbar[data-theme="bright"] .menu-button { border-color: var(--c-black); color: var(--c-black); }
+  .topbar[data-theme="bright"] .menu-button__icon { background: var(--c-black); color: var(--c-yellow); }
+
+  /* ---------- ModalMenu (137:1307) ---------- */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    overflow: hidden;
+    background: var(--c-black);
+    opacity: 0;
+    transition: opacity 320ms ease;
+    overscroll-behavior: contain;
+  }
+  .mobile-menu.is-open { opacity: 1; }
+  .mobile-menu__bar { position: absolute; left: var(--margin); right: var(--margin); top: calc(20 * var(--u)); height: calc(56 * var(--u)); }
+  .mobile-menu__logo { position: absolute; left: 0; top: 0; width: calc(56 * var(--u)); aspect-ratio: 1; }
+  .mobile-menu__logo img { width: 100%; height: 100%; object-fit: cover; }
+  .mobile-menu__links { position: absolute; left: var(--margin); right: var(--margin); top: calc(108 * var(--u)); display: flex; flex-direction: column; }
+  .mobile-menu__link {
+    display: block;
+    padding: calc(20 * var(--u)) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.17);
+    font-family: var(--font-display);
+    font-size: calc(32 * var(--u));
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--c-white);
+  }
+  .mobile-menu__socials { position: absolute; left: var(--margin); bottom: calc(32 * var(--u) + env(safe-area-inset-bottom, 0px)); display: flex; gap: calc(12 * var(--u)); }
+  .mobile-menu__social {
+    display: grid; place-items: center;
+    width: calc(56 * var(--u)); height: calc(56 * var(--u));
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: var(--c-white);
+  }
+  .mobile-menu__social svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+  .mobile-menu__social .mask-icon--discord { width: calc(21 * var(--u)); height: calc(21 * var(--u)); }
+  .mobile-menu__social .mask-icon--x { width: calc(19 * var(--u)); height: calc(17 * var(--u)); }
+  /* entrance: the links and the socials rise in one after another (like the desktop modals' content) */
+  .mobile-menu__link, .mobile-menu__socials {
+    opacity: 0;
+    transform: translateY(calc(28 * var(--u)));
+    transition: opacity 360ms ease, transform 520ms var(--ease-out);
+  }
+  .mobile-menu.is-items .mobile-menu__link, .mobile-menu.is-items .mobile-menu__socials { opacity: 1; transform: none; }
+  .mobile-menu.is-items .mobile-menu__link:nth-child(2) { transition-delay: 60ms; }
+  .mobile-menu.is-items .mobile-menu__link:nth-child(3) { transition-delay: 120ms; }
+  .mobile-menu.is-items .mobile-menu__link:nth-child(4) { transition-delay: 180ms; }
+  .mobile-menu.is-items .mobile-menu__socials { transition-delay: 240ms; }
+
+  /* ---------- First screen: headline block centred (label 14, gap 12, Boldonse 64 / 1.4) ---------- */
+  .studio-label { top: calc(50% - 85 * var(--u)); font-size: 14px; }
+  .title-mask { height: calc(90 * var(--u)); }
+  .title-mask--1 { top: calc(50% - 55 * var(--u)); }
+  .title-mask--2 { top: calc(50% + 35 * var(--u)); }
+  .title-text { height: calc(90 * var(--u)); font-size: calc(64 * var(--u)); }
+  .hero-scroll { right: var(--margin); bottom: calc(20 * var(--u) + env(safe-area-inset-bottom, 0px)); font-weight: 400; font-size: 12px; }
+  .playing-now { left: var(--margin); bottom: calc(20 * var(--u) + env(safe-area-inset-bottom, 0px)); gap: calc(4 * var(--u)); }
+  .playing-now__label { font-weight: 400; font-size: 12px; color: #a1a19b; }
+  .playing-now__title { gap: calc(4 * var(--u)); font-size: 12px; }
+  /* FirstScreen2 shade: dark at the top, clear in the middle, dark at the bottom */
+  .hero__shade { opacity: 1; background: linear-gradient(180deg, rgba(14, 15, 14, 0.33) 0%, rgba(14, 15, 14, 0) 45%, rgba(14, 15, 14, 0.87) 100%); }
+
+  /* ---------- About (132:5678): a plain section — no pinning, no progress bar, static white text ---------- */
+  .about { height: auto; }
+  .about__stage { position: static; height: auto; overflow: visible; padding: calc(60 * var(--u)) var(--margin) calc(72 * var(--u)); }
+  /* 72 between the About text and RELEASED GAMES: the pinned Games stage (label at 50% − 200) is pulled
+     up under About's bottom; its top part is empty and transparent, so nothing of About is covered */
+  .about { margin-bottom: calc(200 * var(--u) - 50vh); margin-bottom: calc(200 * var(--u) - 50svh); }
+  .games, .games__stage { background: transparent; }
+  .reading-progress { display: none; }
+  .about__content { position: static; flex-direction: column; gap: calc(12 * var(--u)); }
+  .about__label { width: auto; font-size: 12px; white-space: normal; color: #a1a19b; }
+  .about__text { width: 100%; font-size: calc(32 * var(--u)); line-height: 1.12; color: var(--c-white); }
+  .about__text .w { color: var(--c-white); background: none; }
+
+  /* ---------- Games intro: label, GAMES marquee (Boldonse 64) over the Ø270 circle ---------- */
+  .games-intro__label { top: calc(50% - 200 * var(--u)); font-size: 12px; color: #a1a19b; }
+  .games-intro__title { left: 0; top: calc(50% - 45 * var(--u)); font-size: calc(64 * var(--u)); }
+
+  /* ---------- Game sections: phone artwork + Artwork shade ---------- */
+  .games-shadow { display: none; }
+  .game-bg::after, .games-video::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(14, 15, 14, 0.467) 0%, rgba(14, 15, 14, 0.133) 50%, rgba(14, 15, 14, 0) 83%, #0e0f0e 100%);
+    pointer-events: none;
+  }
+  .games-video::after { opacity: var(--shade, 0); }   /* the circle shows the plain picture; the shade comes in as it opens */
+  .small-progress { left: var(--margin); right: var(--margin); top: calc(104 * var(--u)); bottom: auto; width: auto; }
+  .small-progress__seg:nth-child(n) { flex: 1 0 0; }
+  /* title + tags at the top, the buttons at the bottom just above AVAILABLE ON */
+  .game-layer__top {
+    top: calc(133 * var(--u));
+    right: var(--margin);
+    bottom: calc(91 * var(--u) + env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+  }
+  .game-title { font-size: calc(32 * var(--u)); white-space: normal; }
+  .game-block[data-game="2"] .game-title br { display: none; }
+  .game-block[data-game="3"] .game-title { font-size: calc(30 * var(--u)); }
+  .game-tags { flex-wrap: wrap; gap: 4px; row-gap: 6px; margin-top: calc(16 * var(--u)); }
+  .game-tags li { gap: 4px; font-size: 12px; }
+  .game-tags li + li::before { width: 4px; height: 4px; min-width: 0; min-height: 0; margin: 0 4px; }
+  .game-buttons { flex-direction: column; align-items: stretch; gap: calc(12 * var(--u)); margin-top: auto; }
+  .cta, .sec-button {
+    justify-content: center;
+    gap: 0;
+    height: calc(56 * var(--u));
+    min-height: 0;
+    padding: 0 calc(20 * var(--u));
+    font-size: 16px;
+  }
+  .cta__icon { display: none; }
+  .game-buttons .sec-button { border-color: rgba(255, 255, 255, 0.2); }
+  .available { bottom: calc(20 * var(--u) + env(safe-area-inset-bottom, 0px)); gap: calc(12 * var(--u)); padding-bottom: calc(8 * var(--u)); }
+  .available__label { font-weight: 400; font-size: 12px; color: #a1a19b; }
+  .available__icons { gap: calc(20 * var(--u)); }
+  .badge { height: calc(20 * var(--u)); }
+  .badge--ps4 { width: calc(96 * var(--u)); }
+  .badge--xbox { width: calc(101 * var(--u)); }
+  .badge--pc { width: calc(28 * var(--u)); }
+
+  /* ---------- Discord ---------- */
+  .discord__text { top: calc(101 * var(--u)); right: var(--margin); width: auto; font-size: 14px; line-height: 1.1; }
+  .discord__character { left: calc(-160 * var(--u)); top: calc(169 * var(--u)); width: calc(500 * var(--u)); height: calc(686 * var(--u)); object-fit: cover; }
+  .discord__fade { left: 0; top: calc(461 * var(--u)); width: 100%; height: calc(214 * var(--u)); background: linear-gradient(180deg, rgba(14, 15, 14, 0), #0e0f0e); }
+  .discord__fade::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 100vh; background: #0e0f0e; }
+  .discord__label { top: calc(354 * var(--u)); font-size: 12px; }
+  .discord-button {
+    top: calc(382 * var(--u));
+    width: calc(100% - 40 * var(--u));
+    height: calc(80 * var(--u));
+    gap: calc(20 * var(--u));
+    padding: 0 calc(12 * var(--u)) 0 calc(20 * var(--u));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    background: var(--c-black);
+  }
+  .discord-button::before { inset: -1px; }
+  .discord-button__logo { width: calc(38 * var(--u)); height: calc(38 * var(--u)); }
+  .discord-button__title { flex: 1; width: auto; font-size: calc(32 * var(--u)); }
+  .discord-button__circle { width: calc(56 * var(--u)); height: calc(56 * var(--u)); }
+  .discord-button__circle svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+
+  /* ---------- FAQ: title above the list; rows 24 · 44 · 24 ---------- */
+  .faq {
+    min-height: 0;
+    padding: calc(30 * var(--u)) var(--margin) calc(56 * var(--u));
+    flex-direction: column;
+    gap: calc(28 * var(--u));
+  }
+  .faq__left { width: auto; gap: calc(12 * var(--u)); }
+  .faq__eyebrow { font-weight: 500; font-size: 12px; white-space: normal; }
+  .faq__title { font-size: calc(32 * var(--u)); }
+  .faq__list { width: 100%; }
+  .faq-row { padding-bottom: calc(24 * var(--u)); }
+  .faq-row__q { align-items: center; gap: calc(12 * var(--u)); padding-top: calc(24 * var(--u)); }
+  .faq-row__num { width: 20px; min-width: 0; margin-top: 0; font-size: 11px; line-height: 1; color: #a1a19b; }
+  .faq-row__text { flex: 1; width: auto; margin-top: 0; font-size: calc(20 * var(--u)); line-height: 1.1; }
+  .faq-row__icon { width: calc(44 * var(--u)); height: calc(44 * var(--u)); min-width: 0; min-height: 0; margin: 0; border-color: rgba(255, 255, 255, 0.2); }
+  .faq-row__icon svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
+  .faq-row__answer { padding: calc(16 * var(--u)) calc(56 * var(--u)) 0 32px; font-size: 14px; line-height: 1.3; }
+
+  /* ---------- Footer (680): centred text · GET IN TOUCH · socials; cookies + © bottom left, ↑ bottom right ---------- */
+  .footer { min-height: calc(680 * var(--u)); }
+  .footer__logo { left: var(--margin); top: calc(20 * var(--u)); width: calc(56 * var(--u)); }
+  .footer__logo { visibility: hidden; }   /* the TopBar stays over the footer (as TopbarBlack) and shows the logo there */
+  .footer__invite { top: calc(50% - 125 * var(--u)); width: calc(290 * var(--u)); font-weight: 500; font-size: 13px; }
+  .footer-button {
+    top: calc(50% - 69 * var(--u));
+    width: calc(100% - 40 * var(--u));
+    height: calc(82 * var(--u));
+    gap: calc(12 * var(--u));
+    padding: 0 calc(12 * var(--u)) 0 calc(24 * var(--u));
+    border: 1px solid var(--c-black);
+    border-radius: calc(49 * var(--u));
+  }
+  .footer-button::before { inset: -1px; }
+  .footer-button__title { flex: 1; width: auto; font-size: calc(28 * var(--u)); line-height: 1; white-space: nowrap; }
+  .footer-button__circle { width: calc(56 * var(--u)); height: calc(56 * var(--u)); }
+  .footer-button__circle svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+  .footer__socials { left: 50%; right: auto; top: calc(50% + 69 * var(--u)); transform: translateX(-50%); gap: calc(12 * var(--u)); }
+  .footer-social { width: calc(56 * var(--u)); height: calc(56 * var(--u)); min-width: 0; min-height: 0; border-color: var(--c-black); }
+  .footer-social svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
+  .footer-social .mask-icon--discord { width: calc(21 * var(--u)); height: calc(21 * var(--u)); min-width: 0; min-height: 0; }
+  .footer-social .mask-icon--x { width: calc(19 * var(--u)); height: calc(17 * var(--u)); min-width: 0; min-height: 0; }
+  .footer__copy, .footer__cookies { font-size: 11px; line-height: 1.4; }
+  .footer__copy { left: var(--margin); bottom: calc(20 * var(--u) + env(safe-area-inset-bottom, 0px)); }
+  .footer__cookies { left: var(--margin); bottom: calc(20 * var(--u) + 19px + env(safe-area-inset-bottom, 0px)); }
+  .footer__top {
+    right: var(--margin);
+    bottom: calc(20 * var(--u) + env(safe-area-inset-bottom, 0px));
+    justify-content: center;
+    width: calc(56 * var(--u)); height: calc(56 * var(--u));
+    gap: 0;
+    border: 1px solid var(--c-black);
+    border-radius: 50%;
+    font-size: 0;
+  }
+  .footer__top svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
+
+  /* ---------- Modals: the page blurs lightly (#040404 at 38 %, blur 3.85) ---------- */
+  .game-modal.is-blurred .game-modal__backdrop {
+    background: rgba(4, 4, 4, 0.38);
+    -webkit-backdrop-filter: blur(3.85px);
+            backdrop-filter: blur(3.85px);
+  }
+  .modal-close { top: calc(20 * var(--u)); right: calc(20 * var(--u)); width: calc(48 * var(--u)); height: calc(48 * var(--u)); min-width: 0; min-height: 0; }
+
+  /* BuyNow (TheFinalStationSectionModalMobile 137:1046): a sheet rising from the bottom, 96 below
+     the top, rounded 32 at the top; content at its bottom, centred */
+  .game-modal--buy .game-modal__panel {
+    left: 0;
+    right: 0;
+    top: calc(96 * var(--u));
+    bottom: 0;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--margin) calc(32 * var(--u) + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 0;
+    border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
+    transform: translateY(100%);
+  }
+  .game-modal--buy.is-panel .game-modal__panel { transform: none; }
+  .buy-modal__content { width: 100%; min-height: 0; margin-top: auto; padding-top: calc(20 * var(--u)); align-items: center; gap: calc(40 * var(--u)); }
+  .buy-modal__head { width: 100%; flex-direction: column; align-items: center; gap: calc(20 * var(--u)); }
+  .buy-modal__heading { display: contents; }
+  .buy-modal__head .buy-modal__eyebrow { order: -1; margin-bottom: calc(-8 * var(--u)); }
+  /* 200 × 200 (Figma); on short phones the cover gives way so the store buttons stay on screen */
+  .buy-modal__cover { width: clamp(96px, 100svh - 540px, 200 * var(--u)); height: auto; aspect-ratio: 1; border: 1px solid rgba(255, 255, 255, 0.18); }
+  .buy-modal__eyebrow { width: 100%; text-align: center; font-size: 12px; }
+  .buy-modal__title { width: 100%; text-align: center; font-size: calc(32 * var(--u)); }
+  .game-modal[data-game="2"] .buy-modal__title { font-size: calc(24 * var(--u)); }   /* the long DLC name: two lines */
+  .game-modal[data-game="3"] .buy-modal__title { font-size: calc(30 * var(--u)); }
+  .game-modal[data-game="2"] .buy-modal__cover, .game-modal[data-game="3"] .buy-modal__cover { width: clamp(96px, 100svh - 580px, 200 * var(--u)); }   /* two-line titles */
+  .buy-modal__platforms { width: 100%; gap: calc(16 * var(--u)); }
+  .buy-modal__stores { flex-direction: column; gap: calc(8 * var(--u)); }
+  .store-pill { flex: none; height: calc(56 * var(--u)); gap: calc(10 * var(--u)); font-size: 16px; }
+  .store-pill svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
+
+  /* WatchTrailer (137:1249): the whole screen, the 16:9 video (370 wide) in the middle */
+  .game-modal--video .game-modal__panel {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+    transform: translateY(calc(24 * var(--u))) scale(0.97);
+  }
+  .game-modal--video.is-panel .game-modal__panel { transform: none; }
+  .video-modal__frame { top: calc(50% - 16 * var(--u)); width: calc(100% - 20 * var(--u)); }
+}

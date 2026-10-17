@@ -80,6 +80,7 @@ window.DMB_CONFIG = {
     },
     steps: {                      // one scroll: the burn starts at once and opens to full screen by itself
       revealDuration: 2600,       // ms — FirstScreen1 → FirstScreen2, whole burn
+      mobileRevealDuration: 1500, // ms — the same on phones (mobile layout): faster
       revealEasing: 'inOutSine',  // gentle start (it begins straight away), smooth stop
       circleRadius: 0.1,          // fraction of the centre → corner distance
       openDuration: 750,

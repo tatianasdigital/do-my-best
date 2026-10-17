@@ -15,6 +15,7 @@
   const topbar = document.querySelector('.topbar');
   const nav = document.querySelector('.navigation');
   const footer = document.querySelector('.footer');
+  const mobileMq = window.matchMedia('(max-width: 767px)');
   let heroBrightTop = true, heroBrightNav = true;   // hero.js switches each one as the burn passes under it
   let footerTop = Infinity;     // document y of the footer (cached on layout)
 
@@ -24,10 +25,15 @@
     const vh = window.innerHeight;
     const G = window.DMBGames;
     const onHero = y < vh * 0.5;
-    const bright = (heroBrightTop && onHero) || !!(G && G.brightTop);
+    // phones: the TopBar stays over the (lime) footer and turns into TopbarBlack once the footer has
+    // reached its middle; on desktop it hides there (the footer has its own logo and socials)
+    const mobile = mobileMq.matches;
+    const tr = topbar.getBoundingClientRect();
+    const topOnFooter = mobile && footerTop - y < (tr.top + tr.bottom) / 2;
+    const bright = (heroBrightTop && onHero) || !!(G && G.brightTop) || topOnFooter;
     const theme = bright ? 'bright' : 'dark';
     if (topbar.dataset.theme !== theme) topbar.dataset.theme = theme;
-    const overFooter = y + vh * 0.5 > footerTop;
+    const overFooter = !mobile && y + vh * 0.5 > footerTop;
     topbar.classList.toggle('is-hidden', overFooter);
     // the Navigation is over the (lime) footer once the footer's top edge has passed its middle
     const r = nav.getBoundingClientRect();
