@@ -37,6 +37,7 @@
   const mobileMq = window.matchMedia('(max-width: 767px)');
   const aboutEl = document.querySelector('.about');
   const pin = section.querySelector('.games-pin');
+  const poster = videoBox.querySelector('.games-video__poster');
   const RL = () => (mobileMq.matches && G.mobileRevealLength ? G.mobileRevealLength : G.revealLength);   // reveal length in screens
 
   section.style.setProperty('--gs-ms', `${G.stateDuration}ms`);
@@ -115,7 +116,7 @@
   // touch screens scroll natively (finger + momentum): no automatic settling there
   const touchUI = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
-  let probe = null;
+  let probe = null, lastClip = '', lastIntroOp = '', lastAboutOp = '';
   function lvhProbe() {
     if (!probe) {
       probe = document.createElement('div');
@@ -147,7 +148,7 @@
     if (mobileMq.matches) { w0 = h0 = (stage.clientWidth || window.innerWidth) * 100 / 390; }
     vw = stage.clientWidth || window.innerWidth;
     measureChrome();
-    lastE = -1; state = -1;
+    lastE = -1; state = -1; lastClip = '';
     update(window.scrollY);
   }
 
@@ -209,11 +210,24 @@
       const t = lerp((vh - sh) / 2, 96 * mu), sx = lerp((vw - sw) / 2, 20 * mu);
       // (fixed to the stage, not to the browser bars: nothing in the card moves while they show / hide)
       const b = lerp((vh - sh) / 2, 20 * mu), rad = 20 * mu;
-      videoBox.style.clipPath = `inset(${t.toFixed(1)}px ${sx.toFixed(1)}px ${b.toFixed(1)}px ${sx.toFixed(1)}px round ${rad.toFixed(1)}px)`;
-      intro.style.opacity = (1 - smooth(0.55, 0.9, e)).toFixed(3);   // GAMES / label give way to the card
+      // the window is a real box with rounded corners (no clip-path: iOS Safari jitters clipped layers under
+      // the blurred MENU pill); the picture inside stays put on the screen
+      const box = `${t.toFixed(1)}|${sx.toFixed(1)}|${b.toFixed(1)}|${rad.toFixed(1)}`;
+      if (box !== lastClip) {                                  // only when it changes (no restyle on every scroll)
+        lastClip = box;
+        Object.assign(videoBox.style, { clipPath: 'none', inset: `${t.toFixed(1)}px ${sx.toFixed(1)}px ${b.toFixed(1)}px`, borderRadius: `${rad.toFixed(1)}px` });
+        Object.assign(poster.style, { inset: 'auto', left: `${(-sx).toFixed(1)}px`, top: `${(-t).toFixed(1)}px`, width: `${vw}px`, height: `${vh}px` });
+      }
+      const io = (1 - smooth(0.55, 0.9, e)).toFixed(3), ao = (1 - smooth(0, 0.3, e)).toFixed(3);
+      if (io !== lastIntroOp) { intro.style.opacity = io; lastIntroOp = io; }   // GAMES / label give way to the card
       // About fades out as soon as Games artwork starts to grow: nothing of it shows behind the card
-      if (aboutEl) aboutEl.style.opacity = (1 - smooth(0, 0.3, e)).toFixed(3);
-    } else if (videoBox.style.clipPath) { videoBox.style.clipPath = ''; intro.style.opacity = ''; if (aboutEl) aboutEl.style.opacity = ''; }
+      if (aboutEl && ao !== lastAboutOp) { aboutEl.style.opacity = ao; lastAboutOp = ao; }
+    } else if (lastClip) {
+      ['clipPath', 'inset', 'borderRadius'].forEach((k) => { videoBox.style[k] = ''; });
+      ['inset', 'left', 'top', 'width', 'height'].forEach((k) => { poster.style[k] = ''; });
+      intro.style.opacity = ''; if (aboutEl) aboutEl.style.opacity = '';
+      lastClip = lastIntroOp = lastAboutOp = '';
+    }
     // phones: after the reveal nothing changes with the scroll any more (state stays 1)
     const s = p < RL() ? 0 : (mobile ? 1 : Math.min(3, 1 + Math.floor((p - RL()) / G.stateLength)));
     setState(s);
@@ -276,7 +290,7 @@
   let revealGliding = false;
   function revealSnap(p, dir) {
     const S = window.SmoothScroll;
-    if (!S || revealGliding || rm.matches) return;
+    if (!S || revealGliding || S.tweening || rm.matches) return;   // not while a link scrolls the page (menu, back to top)
     const R = RL(), eps = 0.015;
     let to = null;
     if (dir > 0 && p > eps && p < R - eps) to = top + vh * R + 1;      // opening: land on the open card

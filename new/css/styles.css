@@ -1449,7 +1449,11 @@ html.theme-lime .games-intro { color: var(--c-black); }
     pointer-events: none;
   }
   .games-video::after { opacity: var(--shade, 0); }   /* the circle shows the plain picture; the shade comes in as it opens */
-  .games-video { background: var(--c-black); }
+  /* no permanent compositing hints on phones: iOS Safari jitters big promoted layers (and the blurred
+     MENU pill above them) once the first card has stopped being pinned and scrolls with the page */
+  .games-video { background: var(--c-black); will-change: auto; }
+  .game-tags li { will-change: auto; }
+  .games-intro__track { will-change: auto; }
   /* cards 2 and 3: in the page flow, 20 apart, as tall as card 1 */
   .game-block[data-game="2"], .game-block[data-game="3"] {
     position: relative;
@@ -1458,7 +1462,8 @@ html.theme-lime .games-intro { color: var(--c-black); }
     min-height: calc(440 * var(--u));
     margin: calc(20 * var(--u)) var(--margin) 0;
     border-radius: calc(20 * var(--u));
-    clip-path: inset(0 round calc(20 * var(--u)));
+    clip-path: none;                    /* rounded by border-radius + overflow: hidden (no clip-path layers on iOS) */
+    overflow: hidden;
     background: var(--c-black);
     filter: none !important;
     visibility: visible !important;
