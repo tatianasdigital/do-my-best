@@ -35,6 +35,7 @@
   const progress = section.querySelector('.small-progress');
   const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobileMq = window.matchMedia('(max-width: 767px)');
+  const aboutEl = document.querySelector('.about');
 
   section.style.setProperty('--gs-ms', `${G.stateDuration}ms`);
   document.documentElement.style.setProperty('--theme-ms', `${G.litDuration}ms`);
@@ -112,16 +113,29 @@
   // touch screens scroll natively (finger + momentum): no automatic settling there
   const touchUI = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
+  let probe = null;
+  function lvhProbe() {
+    if (!probe) {
+      probe = document.createElement('div');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
+      document.body.appendChild(probe);
+    }
+    return probe;
+  }
+
   function layout() {
     vh = window.innerHeight;
+    // phones: the stage is 100lvh (stable while the address bar shows / hides) — measure that
+    if (mobileMq.matches) vh = lvhProbe().offsetHeight || vh;
     const u = Math.min(window.innerWidth / 1920, vh / 1080);
     // + one extra screen at the end: TheBookwalkerSection stays pinned while DiscordSection
     // (pulled up by one screen in CSS) slides up over it
     section.style.height = `${vh * (2 + G.revealLength + 3 * G.stateLength)}px`;
     top = section.getBoundingClientRect().top + window.scrollY;
     w0 = 302 * u; h0 = 302 * u;   // GamesNewImage: circle Ø604
-    // phones (mobile layout, HomePageMobile 132:5609): the circle starts at Ø270 on a 390-px-wide screen (scales with the width)
-    if (window.matchMedia('(max-width: 767px)').matches) { w0 = h0 = (stage.clientWidth || window.innerWidth) * 135 / 390; }
+    // phones (mobile layout): Games artwork starts as a 200 × 200 circle on a 390-px-wide screen (scales with the width)
+    if (mobileMq.matches) { w0 = h0 = (stage.clientWidth || window.innerWidth) * 100 / 390; }
     vw = stage.clientWidth || window.innerWidth;
     measureChrome();
     lastE = -1; state = -1;
@@ -149,6 +163,7 @@
       el.setAttribute('aria-hidden', n === k ? 'false' : 'true');
     });
     segs.forEach((s, i) => s.classList.toggle('is-filled', i < k));
+    if (aboutEl) aboutEl.classList.toggle('is-under', k >= 1);   // phones: About (riding along) is hidden under the opened circle
     progress.setAttribute('aria-valuenow', Math.max(1, k));
     if (window.DMBBuyMenu) window.DMBBuyMenu.closeAll();
   }
@@ -207,12 +222,12 @@
     const dir = y - lastY;
     lastY = y;
     const S = window.SmoothScroll;
-    // touch screens (phones): the same settling, once the finger is off and the swipe's momentum has
-    // run out — scrolling on from the last game screen brings DiscordSection to the top of the screen,
-    // scrolling back up returns to the game
-    if (touchUI && dir !== 0 && S && !S.tweening) {
+    // touch screens (phones): the same settling, with no pause — the moment the finger lets go (or the
+    // swipe's momentum carries the page into the hand-over), DiscordSection glides to the top of the
+    // screen; scrolling back up returns to the game
+    if (touchUI && dir !== 0 && !touchSnapping) {
       touchDir = dir > 0 ? 1 : -1;
-      if (!fingerDown) armTouchSnap();
+      if (!fingerDown) touchSnap();
     }
     if (S && S.enabled && !touchUI && !S.tweening && cover > 0.002 && cover < 0.998 && dir !== 0) {
       const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
@@ -221,25 +236,41 @@
   }
 
   /* ---------- touch: DiscordSection settles at the top after a swipe ---------- */
-  let fingerDown = false, touchDir = 1, touchTimer = 0, touchSnapping = false;
-  function armTouchSnap() { clearTimeout(touchTimer); touchTimer = setTimeout(touchSnap, 140); }
+  let fingerDown = false, touchDir = 1, touchSnapping = false, touchY0 = 0;
+  const html = document.documentElement;
+  function unlockAfterSnap() {
+    touchSnapping = false;
+    const busy = (window.DMBHero && window.DMBHero.locksPage) || (window.DMBGameModals && window.DMBGameModals.isOpen) || (window.DMBMobileMenu && window.DMBMobileMenu.isOpen);
+    if (!busy) html.classList.remove('is-locked');
+  }
   function touchSnap() {
     const S = window.SmoothScroll;
-    if (fingerDown || !S || S.tweening) return;
+    if (fingerDown || touchSnapping || !S) return;
     const z0 = top + vh * (G.revealLength + 3 * G.stateLength), z1 = z0 + vh;
     const cover = (window.scrollY - z0) / vh;
     if (cover <= 0.002 || cover >= 0.998) return;
     touchSnapping = true;
-    S.scrollTo(touchDir > 0 ? z1 : z0, { duration: window.DMB_CONFIG.smooth.snapDuration, done: () => { touchSnapping = false; } });
+    html.classList.add('is-locked');          // stops the swipe's momentum, so it can't fight the glide
+    const to = touchDir > 0 ? z1 : z0;
+    const ms = Math.max(280, (TOUCH_SNAP_MS * Math.abs(to - window.scrollY)) / vh);
+    S.scrollTo(to, { duration: ms, done: unlockAfterSnap });
   }
+  const TOUCH_SNAP_MS = 700;                  // a whole screen; shorter distances take proportionally less
   if (touchUI) {
-    window.addEventListener('touchstart', () => {
+    window.addEventListener('touchstart', (e) => {
       fingerDown = true;
-      clearTimeout(touchTimer);
+      touchY0 = e.touches[0] ? e.touches[0].clientY : 0;
       // a new touch takes over from a settling scroll (no fighting the finger)
-      if (touchSnapping && window.SmoothScroll) { window.SmoothScroll.stop(); touchSnapping = false; }
+      if (touchSnapping && window.SmoothScroll) { window.SmoothScroll.stop(); unlockAfterSnap(); }
     }, { passive: true });
-    const up = () => { fingerDown = false; armTouchSnap(); };
+    let touchYLast = 0;
+    window.addEventListener('touchmove', (e) => { if (e.touches[0]) touchYLast = e.touches[0].clientY; }, { passive: true });
+    const up = () => {
+      fingerDown = false;
+      if (touchYLast && Math.abs(touchYLast - touchY0) > 4) touchDir = touchYLast < touchY0 ? 1 : -1;   // finger moved up = page down
+      touchYLast = 0;
+      touchSnap();
+    };
     window.addEventListener('touchend', up, { passive: true });
     window.addEventListener('touchcancel', up, { passive: true });
   }

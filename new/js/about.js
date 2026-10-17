@@ -71,6 +71,7 @@
   function layout() {
     if (mobile.matches) {
       section.style.height = '';
+      section.style.setProperty('--about-h', `${section.offsetHeight}px`);   // CSS: sticky offset (rides along with the Games screen)
       top = section.getBoundingClientRect().top + window.scrollY;
       current = -1;
       return;

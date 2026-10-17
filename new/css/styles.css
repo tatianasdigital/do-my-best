@@ -1252,6 +1252,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
 
 /* phones-only elements: never shown in the desktop layout */
 .menu-button { display: none; }
+.about-games { display: contents; }   /* wrapper of About + Games: a box only on phones (sticky About) */
 .mobile-menu[hidden] { display: none; }
 
 /* =====================================================================
@@ -1269,13 +1270,19 @@ html.theme-lime .games-intro { color: var(--c-black); }
   }
   html { overscroll-behavior-y: none; }
 
-  /* Full-screen blocks follow the phone's REAL visible height (dvh: it changes when the browser's
-     address bar shows / hides), so HeroWorldBuilders, HeroWorldDestroyers, the game sections,
-     DiscordSection and the Footer always fill the screen exactly (svh first: older browsers) */
-  .hero { height: 100svh; height: 100dvh; }
-  .games__stage { height: 100svh; height: 100dvh; }
-  .discord { height: 100svh; height: 100dvh; margin-top: -100svh; margin-top: -100dvh; }
-  .footer { height: 100svh; height: 100dvh; min-height: 440px; }
+  /* Full-screen blocks. Their heights must NOT change while scrolling (when the browser's address bar
+     hides / shows), or everything below them jumps — so they use stable units:
+     – the first screens and the Footer: svh (the screen with the bars shown — they are on screen
+       at the top and at the end of the page, where the bars are shown);
+     – the pinned game stage: lvh (the screen with the bars hidden); what has to stay on screen
+       (Game actions) is lifted by the bars' height while they are shown (lvh − dvh), which moves only
+       those elements, never the page. */
+  .hero { height: 100svh; }
+  .games__stage { height: 100vh; height: 100lvh; }
+  .footer { height: 100svh; min-height: 440px; }
+  /* DiscordSection (132:5904): its own height (667), not the whole screen; it still slides up over the
+     pinned TheBookwalkerSection during the extra last screen of the stage */
+  .discord { height: calc(667 * var(--u)); margin-top: -100vh; margin-top: -100lvh; }
 
   /* ---------- Top bar (137:693): logo 56 + MenuMobile pill; no socials, no NavigationNew ---------- */
   .topbar { top: calc(20 * var(--u)); height: calc(56 * var(--u)); }
@@ -1400,7 +1407,13 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .about__stage { position: static; height: auto; overflow: visible; padding: calc(60 * var(--u)) var(--margin) calc(72 * var(--u)); }
   /* 72 between the About text and RELEASED GAMES: the pinned Games stage (label at 50% − 200) is pulled
      up under About's bottom; its top part is empty and transparent, so nothing of About is covered */
-  .about { margin-bottom: calc(200 * var(--u) - 50svh); margin-bottom: calc(200 * var(--u) - 50dvh); }
+  .about { margin-bottom: calc(160 * var(--u) - 50vh); margin-bottom: calc(160 * var(--u) - 50lvh); }
+  /* About section rides along with the Games screen: it stops moving at the moment the Games stage pins
+     (about.js measures its height into --about-h) and stays above RELEASED GAMES while the circle grows;
+     once the circle has covered the screen it is hidden underneath (games.js: .is-under) */
+  .about-games { display: block; }
+  .about { position: sticky; top: calc(50vh - 160 * var(--u) - var(--about-h, 0px)); top: calc(50lvh - 160 * var(--u) - var(--about-h, 0px)); }
+  .about.is-under { visibility: hidden; }
   .games, .games__stage { background: transparent; }
   .reading-progress { display: none; }
   .about__content { position: static; flex-direction: column; gap: calc(12 * var(--u)); }
@@ -1409,7 +1422,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .about__text .w { color: var(--c-white); background: none; }
 
   /* ---------- Games intro: label, GAMES marquee (Boldonse 64) over the Ø270 circle ---------- */
-  .games-intro__label { top: calc(50% - 200 * var(--u)); font-size: 12px; color: #a1a19b; }
+  .games-intro__label { top: calc(50% - 160 * var(--u)); font-size: 12px; color: #a1a19b; }   /* 36 above the Ø200 Games artwork */
   .games-intro__title { left: 0; top: calc(50% - 45 * var(--u)); font-size: calc(64 * var(--u)); }
 
   /* ---------- Game sections: phone artwork + Artwork shade ---------- */
@@ -1428,7 +1441,8 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .game-layer__top {
     top: calc(133 * var(--u));
     right: var(--margin);
-    bottom: calc(32px + 15px + 56 * var(--u) + env(safe-area-inset-bottom, 0px));   /* Game actions: AVAILABLE ON (15 + 12 + 20 + 8) + gap 16 above the screen's 32-px bottom margin */
+    bottom: calc(32px + 15px + 56 * var(--u) + env(safe-area-inset-bottom, 0px));
+    bottom: calc(32px + 15px + 56 * var(--u) + env(safe-area-inset-bottom, 0px) + 100lvh - 100dvh);   /* Game actions: AVAILABLE ON (15 + 12 + 20 + 8) + gap 16 above the screen's 32-px bottom margin */
     align-items: stretch;
   }
   .game-title { font-size: calc(32 * var(--u)); white-space: normal; }
@@ -1448,7 +1462,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
   }
   .cta__icon { display: none; }
   .game-buttons .sec-button { border-color: rgba(255, 255, 255, 0.2); }
-  .available { bottom: calc(32px + env(safe-area-inset-bottom, 0px));   /* Game actions always 32 px above the bottom of the screen */
+  .available { bottom: calc(32px + env(safe-area-inset-bottom, 0px)); bottom: calc(32px + env(safe-area-inset-bottom, 0px) + 100lvh - 100dvh);   /* Game actions always 32 px above the bottom of the screen */
                 gap: calc(12 * var(--u)); padding-bottom: calc(8 * var(--u)); }
   .available__label { font-weight: 400; font-size: 12px; line-height: 15px; color: #a1a19b; }
   .available__icons { gap: calc(20 * var(--u)); }
@@ -1543,13 +1557,16 @@ html.theme-lime .games-intro { color: var(--c-black); }
   }
   .modal-close { top: calc(20 * var(--u)); right: calc(20 * var(--u)); width: calc(48 * var(--u)); height: calc(48 * var(--u)); min-width: 0; min-height: 0; }
 
-  /* BuyNow (TheFinalStationSectionModalMobile 137:1046): a sheet rising from the bottom, 96 below
-     the top, rounded 32 at the top; content at its bottom, centred */
+  /* BuyNow (TheFinalStationSectionModalMobile 137:1046): a sheet rising from the bottom, rounded 32 at
+     the top. Frame 100 is as tall as its content (no fixed height): 44 · Frame 102 · 40 · Frame 75 · 32.
+     Only if a phone is too short for it does it stop 24 below the top and scroll. */
   .game-modal--buy .game-modal__panel {
     left: 0;
     right: 0;
-    top: calc(96 * var(--u));
+    top: auto;
     bottom: 0;
+    max-height: calc(100svh - 24px);
+    max-height: calc(100dvh - 24px);
     width: auto;
     display: flex;
     flex-direction: column;
@@ -1562,21 +1579,15 @@ html.theme-lime .games-intro { color: var(--c-black); }
     transform: translateY(100%);
   }
   .game-modal--buy.is-panel .game-modal__panel { transform: none; }
-  .buy-modal__content { flex: 1 0 auto; width: 100%; min-height: 0; align-items: center; gap: calc(40 * var(--u)); }
-  .buy-modal__platforms { margin-top: auto; }   /* the store buttons stay at the bottom of the sheet */
+  .buy-modal__content { flex: none; width: 100%; min-height: 0; align-items: center; gap: calc(40 * var(--u)); }
   .buy-modal__head { width: 100%; flex-direction: column; align-items: center; gap: calc(20 * var(--u)); }
   .buy-modal__heading { display: contents; }
   .buy-modal__head .buy-modal__eyebrow { order: -1; margin-bottom: calc(-8 * var(--u)); }
-  /* 200 × 200 (Figma); on short phones the cover gives way so the store buttons stay on screen */
-  /* the cover is 200 (Figma) when the sheet has room; on shorter screens it gives way so the title and
-     the store buttons always fit: screen − sheet top 96 − everything else in the sheet (378) − the title */
-  .buy-modal__cover { --title-h: calc(45 * var(--u)); width: clamp(80px, 100svh - 474 * var(--u) - var(--title-h), 200 * var(--u)); width: clamp(80px, 100dvh - 474 * var(--u) - var(--title-h), 200 * var(--u)); height: auto; aspect-ratio: 1; border: 1px solid rgba(255, 255, 255, 0.18); }
+  .buy-modal__cover { width: calc(200 * var(--u)); height: calc(200 * var(--u)); border: 1px solid rgba(255, 255, 255, 0.18); }   /* Frame 72: 200 × 200 */
   .buy-modal__eyebrow { width: 100%; text-align: center; font-size: 12px; }
   .buy-modal__title { width: 100%; text-align: center; font-size: calc(32 * var(--u)); }
   .game-modal[data-game="2"] .buy-modal__title { font-size: calc(24 * var(--u)); }   /* the long DLC name: two lines */
   .game-modal[data-game="3"] .buy-modal__title { font-size: calc(30 * var(--u)); }
-  .game-modal[data-game="2"] .buy-modal__cover { --title-h: calc(68 * var(--u)); }   /* two lines of 24 × 1.4 */
-  .game-modal[data-game="3"] .buy-modal__cover { --title-h: calc(84 * var(--u)); }   /* two lines of 30 × 1.4 */
   .buy-modal__platforms { width: 100%; gap: calc(16 * var(--u)); }
   .buy-modal__stores { flex-direction: column; gap: calc(8 * var(--u)); }
   .store-pill { flex: none; height: calc(56 * var(--u)); gap: calc(10 * var(--u)); font-size: 16px; }
@@ -1589,12 +1600,12 @@ html.theme-lime .games-intro { color: var(--c-black); }
     width: 100%;
     height: 100%;
     aspect-ratio: auto;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 0;                          /* ModalVideoMobile: no outline */
     border-radius: 0;
     transform: translateY(calc(24 * var(--u))) scale(0.97);
   }
   .game-modal--video.is-panel .game-modal__panel { transform: none; }
-  .video-modal__frame { top: calc(50% - 16 * var(--u)); width: calc(100% - 20 * var(--u)); }
+  .video-modal__frame { top: calc(50% - 16 * var(--u)); width: calc(100% - 2 * var(--margin)); aspect-ratio: 350 / 196; }   /* Video: 350 × 196, 20 from the screen's sides */
 }
 
 /* =====================================================================

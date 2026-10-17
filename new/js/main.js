@@ -54,8 +54,13 @@
     hero.layout();
     measure();
   }
-  let resizeTimer = 0;
+  let resizeTimer = 0, lastW = window.innerWidth;
+  const phone = window.matchMedia('(max-width: 767px)');
   window.addEventListener('resize', () => {
+    // phones: the address bar showing / hiding changes only the height — the layout uses stable
+    // heights there (svh / lvh), so nothing is re-measured (no jumps while scrolling)
+    if (phone.matches && window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(layout, 150);
   });
