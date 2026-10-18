@@ -58,7 +58,9 @@
     modal.offsetWidth;
     if (phone.matches) {
       modal.classList.remove('is-closing');
-      modal.classList.add('is-cols', 'is-panel');                       // 1. the columns rise
+      modal.classList.add('is-cols');                                   // the columns are laid out at height 0 …
+      modal.offsetWidth;                                                // (style flushed, so the rise can animate)
+      modal.classList.add('is-panel');                                  // 1. … and rise
       later(() => {                                                     // 2. the content comes in
         modal.classList.add('is-content');
         const first = modal.querySelector(modal === buy ? '.store-pill' : '.modal-close');
