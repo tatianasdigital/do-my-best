@@ -123,7 +123,7 @@ window.DMB_CONFIG = {
   about: {
     stageLength: 0.32,            // viewport heights of scrolling per line
     holdLength: 0.35,             // extra scrolling after the last line before the section moves on
-    mobileFillDuration: 1800,     // ms — phones: the whole text fills line by line in one eased sweep
+    mobileFillDuration: 2000,     // ms — phones: the whole text fills line by line in one eased sweep
     fillDuration: 1100,           // ms — a read line fills from left to right (ease-in-out)
   },
 

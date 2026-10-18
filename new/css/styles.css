@@ -1254,7 +1254,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
 .games.is-revealed .games-intro, .games.is-covering .games-intro { visibility: hidden; }
 
 /* phones-only elements: never shown in the desktop layout */
-.menu-button { display: none; }
+.menu-button, .modal-cols { display: none; }
 .about-games, .games-pin { display: contents; }   /* wrapper of About + Games: a box only on phones (sticky About) */
 .mobile-menu[hidden] { display: none; }
 
@@ -1573,7 +1573,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
     gap: calc(28 * var(--u));
   }
   .faq__left { width: auto; gap: calc(12 * var(--u)); }
-  .faq__eyebrow { font-weight: 500; font-size: 12px; white-space: normal; }
+  .faq__eyebrow { font-weight: 500; font-size: 12px; white-space: normal; color: #a1a19b; }
   .faq__title { font-size: calc(32 * var(--u)); }
   .faq__list { width: 100%; }
   .faq-row { padding-bottom: calc(24 * var(--u)); }
@@ -1661,6 +1661,28 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .buy-modal__stores { flex-direction: column; gap: calc(8 * var(--u)); }
   .store-pill { flex: none; height: calc(56 * var(--u)); gap: calc(10 * var(--u)); font-size: 14px; }
   .store-pill svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
+
+  /* BuyNow / WatchTrailer on phones: the same columns entrance and exit as the ModalMenu (game-modals.js
+     adds .is-cols): the panel itself is transparent, five dark columns fill it from the bottom up, then
+     the content and the close button come in; closing: they go, then the columns leave upwards */
+  .game-modal.is-cols .game-modal__panel { background: transparent; opacity: 1; transform: none; transition: none; isolation: isolate; }
+  .game-modal.is-cols .modal-cols { display: flex; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .modal-cols span {
+    flex: 1 0 0;
+    margin-right: -1px;
+    background: var(--c-black);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform 640ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  .game-modal.is-panel .modal-cols span { transform: scaleY(1); }
+  .game-modal.is-closing .modal-cols span { transform: scaleY(0); transform-origin: 50% 0; }
+  .modal-cols span:nth-child(2) { transition-delay: 70ms; }
+  .modal-cols span:nth-child(3) { transition-delay: 140ms; }
+  .modal-cols span:nth-child(4) { transition-delay: 210ms; }
+  .modal-cols span:nth-child(5) { transition-delay: 280ms; }
+  .game-modal.is-cols .modal-close { z-index: 2; opacity: 0; transition: opacity 260ms ease; }
+  .game-modal.is-cols.is-content .modal-close { opacity: 1; }
 
   /* WatchTrailer (137:1249): the whole screen, the 16:9 video (370 wide) in the middle */
   .game-modal--video .game-modal__panel {

@@ -23,6 +23,10 @@
   let current = null, timers = [], savedY = 0, lastFocus = null;
 
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  // phones: the same entrance / exit as the ModalMenu — dark vertical columns fill the screen from the
+  // bottom up, then the content comes in; closing: the content goes, the columns leave upwards
+  const phone = window.matchMedia('(max-width: 767px)');
+  const COLS_OPEN_MS = 760, COLS_TEXT_OUT_MS = 220, COLS_CLOSE_MS = 980;
   const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
   for (const m of [buy, video]) m.style.setProperty('--nav-blur-ms', `${N.blurDuration}ms`);
 
@@ -52,6 +56,16 @@
     for (const el of [page, topbar, nav]) el.setAttribute('inert', '');
     modal.hidden = false;
     modal.offsetWidth;
+    if (phone.matches) {
+      modal.classList.remove('is-closing');
+      modal.classList.add('is-cols', 'is-panel');                       // 1. the columns rise
+      later(() => {                                                     // 2. the content comes in
+        modal.classList.add('is-content');
+        const first = modal.querySelector(modal === buy ? '.store-pill' : '.modal-close');
+        if (first) first.focus({ preventScroll: true });
+      }, COLS_OPEN_MS);
+      return;
+    }
     modal.classList.add('is-blurred');                       // 1. the page blurs
     later(() => modal.classList.add('is-panel'), N.panelDelay);   // 2. the black panel rises in
     later(() => {                                             // 3. its content appears
@@ -67,17 +81,27 @@
     current = null;
     clearTimers();
     modal.classList.remove('is-content');
+    if (modal.classList.contains('is-cols')) {                          // phones: columns leave upwards
+      later(() => modal.classList.add('is-closing'), COLS_TEXT_OUT_MS);
+      later(() => {
+        modal.classList.remove('is-cols', 'is-panel', 'is-closing');
+        finish(modal);
+      }, COLS_TEXT_OUT_MS + COLS_CLOSE_MS);
+      return;
+    }
     later(() => modal.classList.remove('is-panel'), 80);
     later(() => modal.classList.remove('is-blurred'), 120);
-    later(() => {
-      modal.hidden = true;
-      if (modal === video) frame.innerHTML = '';               // stop the trailer
-      for (const el of [page, topbar, nav]) el.removeAttribute('inert');
-      if (!(window.DMBHero && window.DMBHero.locksPage)) document.documentElement.classList.remove('is-locked');
-      window.scrollTo(0, savedY);
-      if (window.DMBYouTube) window.DMBYouTube.resumeAll();     // …and carry on where they stopped
-      if (lastFocus) lastFocus.focus({ preventScroll: true });
-    }, 120 + N.closeDuration);
+    later(() => finish(modal), 120 + N.closeDuration);
+  }
+
+  function finish(modal) {
+    modal.hidden = true;
+    if (modal === video) frame.innerHTML = '';               // stop the trailer
+    for (const el of [page, topbar, nav]) el.removeAttribute('inert');
+    if (!(window.DMBHero && window.DMBHero.locksPage)) document.documentElement.classList.remove('is-locked');
+    window.scrollTo(0, savedY);
+    if (window.DMBYouTube) window.DMBYouTube.resumeAll();     // …and carry on where they stopped
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
   }
 
   document.addEventListener('click', (e) => {
