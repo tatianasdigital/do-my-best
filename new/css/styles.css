@@ -1422,8 +1422,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
   .reading-progress { display: none; }
   .about__content { position: static; flex-direction: column; gap: calc(12 * var(--u)); }
   .about__label { width: auto; font-size: 12px; white-space: normal; color: #a1a19b; }
-  .about__text { width: 100%; font-size: calc(32 * var(--u)); line-height: 1.12; color: var(--c-white); }
-  .about__text .w { color: var(--c-white); background: none; }
+  .about__text { width: 100%; font-size: calc(32 * var(--u)); line-height: 1.12; color: #434343; }   /* fills with #E3F14A line by line (about.js) */
 
   /* ---------- Games (GameSectionNew 143:1892) ----------
      .games-pin is pinned for one screen + the reveal: Games artwork (a Ø200 circle) stretches into the
@@ -1511,9 +1510,9 @@ html.theme-lime .games-intro { color: var(--c-black); }
     margin-top: auto;
     padding-top: calc(28 * var(--u));
   }
-  .game-buttons .sec-button { order: 0; }
+  .game-buttons .cta--buy { order: 0; }
   .game-buttons .cta--trailer { order: 1; }
-  .game-buttons .cta--buy { order: 2; }
+  .game-buttons .sec-button { order: 2; }
   .cta, .sec-button {
     justify-content: center;
     gap: 0;
@@ -1540,7 +1539,7 @@ html.theme-lime .games-intro { color: var(--c-black); }
 
   /* ---------- Discord (132:5904, 606 high) ---------- */
   .discord { height: calc(606 * var(--u)); }
-  .discord__text { top: calc(48 * var(--u)); right: auto; width: calc(236 * var(--u)); font-size: 14px; line-height: 1; }
+  .discord__text { top: calc(48 * var(--u)); right: auto; width: calc(236 * var(--u)); font-size: 14px; line-height: 1; color: #a1a19b; }
   /* Character artwork placed as in Figma (the same picture as on desktop: 513 × 679 at x −170 / y 119),
      cut off with its fade 595 below the section's top */
   .discord__character { left: calc(-170 * var(--u)); top: calc(119 * var(--u)); width: calc(513 * var(--u)); height: calc(679 * var(--u)); object-fit: fill; clip-path: inset(0 0 calc(203 * var(--u)) 0); }
@@ -1630,40 +1629,37 @@ html.theme-lime .games-intro { color: var(--c-black); }
   }
   .modal-close { top: calc(20 * var(--u)); right: calc(20 * var(--u)); width: calc(48 * var(--u)); height: calc(48 * var(--u)); min-width: 0; min-height: 0; }
 
-  /* BuyNow (TheFinalStationSectionModalMobile 137:1046): a sheet rising from the bottom, rounded 32 at
-     the top. Frame 100 is as tall as its content (no fixed height): 44 · Frame 102 · 40 · Frame 75 · 32.
-     Only if a phone is too short for it does it stop 24 below the top and scroll. */
+  /* BuyNow (BuyNowModalMobile 148:2090): the whole screen. Header: BUY NOW on the left, the close
+     button on the right (20 around); the cover (200) and the game's name; at the bottom CHOOSE YOUR
+     PLATFORM and the three store buttons (56, 8 apart), 32 above the bottom. It slides up from below. */
   .game-modal--buy .game-modal__panel {
-    left: 0;
-    right: 0;
-    top: auto;
-    bottom: 0;
-    max-height: calc(100svh - 24px);
-    max-height: calc(100dvh - 24px);
-    width: auto;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: none;
     display: flex;
     flex-direction: column;
-    padding: calc(44 * var(--u) - 1px) var(--margin) calc(32 * var(--u) + env(safe-area-inset-bottom, 0px));   /* Frame 102 starts 44 below the sheet's top (Frame 103) */
+    padding: calc(88 * var(--u)) var(--margin) calc(32 * var(--u) + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     overscroll-behavior: contain;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-bottom: 0;
-    border-radius: calc(32 * var(--u)) calc(32 * var(--u)) 0 0;
+    border: 0;
+    border-radius: 0;
     transform: translateY(100%);
   }
   .game-modal--buy.is-panel .game-modal__panel { transform: none; }
-  .buy-modal__content { flex: none; width: 100%; min-height: 0; align-items: center; gap: calc(40 * var(--u)); }
+  .game-modal--buy .buy-modal__content { flex: 1 0 auto; width: 100%; min-height: 0; align-items: center; gap: 0; transform: none; }
   .buy-modal__head { width: 100%; flex-direction: column; align-items: center; gap: calc(20 * var(--u)); }
   .buy-modal__heading { display: contents; }
-  .buy-modal__head .buy-modal__eyebrow { order: -1; margin-bottom: calc(-8 * var(--u)); }
-  .buy-modal__cover { width: calc(200 * var(--u)); height: calc(200 * var(--u)); border: 1px solid rgba(255, 255, 255, 0.18); }   /* Frame 72: 200 × 200 */
+  /* BUY NOW sits in the header, level with the close button */
+  .buy-modal__head .buy-modal__eyebrow { position: absolute; left: var(--margin); top: calc(44 * var(--u) - 6px); width: auto; text-align: left; }
+  .buy-modal__cover { width: calc(200 * var(--u)); height: calc(200 * var(--u)); border: 1px solid rgba(255, 255, 255, 0.18); }   /* 200 × 200 */
   .buy-modal__eyebrow { width: 100%; text-align: center; font-size: 12px; }
   .buy-modal__title { width: 100%; text-align: center; font-size: calc(32 * var(--u)); }
   .game-modal[data-game="2"] .buy-modal__title { font-size: calc(24 * var(--u)); }   /* the long DLC name: two lines */
   .game-modal[data-game="3"] .buy-modal__title { font-size: calc(30 * var(--u)); }
-  .buy-modal__platforms { width: 100%; gap: calc(16 * var(--u)); }
+  .buy-modal__platforms { width: 100%; gap: calc(16 * var(--u)); margin-top: auto; padding-top: calc(20 * var(--u)); }
   .buy-modal__stores { flex-direction: column; gap: calc(8 * var(--u)); }
-  .store-pill { flex: none; height: calc(56 * var(--u)); gap: calc(10 * var(--u)); font-size: 16px; }
+  .store-pill { flex: none; height: calc(56 * var(--u)); gap: calc(10 * var(--u)); font-size: 14px; }
   .store-pill svg { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 0; min-height: 0; }
 
   /* WatchTrailer (137:1249): the whole screen, the 16:9 video (370 wide) in the middle */

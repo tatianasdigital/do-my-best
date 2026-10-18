@@ -65,8 +65,35 @@
     bar.setAttribute('aria-valuemax', lines.length);
   }
 
-  // phones (HomePageMobile): the About text is static and white — no pinning, no progress bar
+  // phones (HomePageMobile): no pinning, no progress bar. The text is #434343; once the reader reaches
+  // it, it fills with #E3F14A line by line, left to right, as ONE eased sweep across all the lines
+  // (smooth acceleration at the start, smooth slowing at the end), A.mobileFillDuration long.
   const mobile = window.matchMedia('(max-width: 767px)');
+  let mPlayed = false, mRaf = 0, mT0 = 0, mP = 0;
+  function mPaint(P) {                        // P: 0…1 of the whole sweep
+    mP = P;
+    const total = geo.reduce((s, g) => s + g.w, 0) || 1;
+    let pos = P * total;
+    geo.forEach((g, li) => {
+      anim[li].v = anim[li].to = anim[li].from = Math.min(1, Math.max(0, pos / g.w));
+      pos -= g.w;
+      paint(li);
+    });
+  }
+  function mStep(now) {
+    const k = rm.matches ? 1 : Math.min(1, (now - mT0) / (A.mobileFillDuration || 1600));
+    mPaint(ease(k));
+    mRaf = k < 1 ? requestAnimationFrame(mStep) : 0;
+  }
+  function mUpdate() {
+    const r = text.getBoundingClientRect(), vh = window.innerHeight;
+    if (!mPlayed && r.top < vh * 0.72 && r.bottom > 0) {          // the reader has reached the text
+      mPlayed = true; mT0 = performance.now();
+      if (!mRaf) mRaf = requestAnimationFrame(mStep);
+    } else if (mPlayed && section.getBoundingClientRect().top > vh) {   // back up above it: plays again next time
+      mPlayed = false; cancelAnimationFrame(mRaf); mRaf = 0; mPaint(0);
+    }
+  }
 
   function layout() {
     if (mobile.matches) {
@@ -74,6 +101,9 @@
       section.style.setProperty('--about-h', `${section.offsetHeight}px`);   // CSS: sticky offset (rides along with the Games screen)
       top = section.getBoundingClientRect().top + window.scrollY;
       current = -1;
+      measureLines();
+      mPaint(mPlayed && !mRaf ? 1 : mP);
+      mUpdate();
       return;
     }
     measureLines();
@@ -111,7 +141,7 @@
   }
 
   function update(y) {
-    if (mobile.matches) return;
+    if (mobile.matches) { mUpdate(); return; }
     const rel = y - top;
     const k = rel < -1 ? 0 : Math.min(lines.length, 1 + Math.floor(Math.max(0, rel) / stagePx));
     if (k === current) return;
