@@ -937,8 +937,19 @@ html.theme-lime .games-intro { color: var(--c-black); }
   transition: opacity 300ms ease, transform 420ms var(--ease-out);
 }
 .faq-row.is-open .faq-row__answer { opacity: 1; transform: none; transition-delay: 80ms; }
-.faq-row__answer a { text-decoration: underline; text-decoration-skip-ink: none; text-underline-position: from-font; }
-.faq-row__answer a:hover { color: var(--c-yellow); }
+.faq-row__answer a {
+  /* like PlayingNowTitleContainer (108:1391): white text, a thin 40 % white line 4 below it that fills with
+     #FFFFFF from left to right on hover (drawn as backgrounds, so it also follows a link that wraps) */
+  color: var(--c-white);
+  text-decoration: none;
+  padding-bottom: calc(4 * var(--u));
+  background-image: linear-gradient(var(--c-white), var(--c-white)), linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4));
+  background-size: 0% 1px, 100% 1px;
+  background-position: 0 100%, 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size var(--hover-ms, 700ms) var(--ease-in-out);
+}
+.faq-row__answer a:hover, .faq-row__answer a:focus-visible { background-size: 100% 1px, 100% 1px; }
 
 /* =====================================================================
    FOOTER (75:1424)
